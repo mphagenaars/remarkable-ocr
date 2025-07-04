@@ -1,0 +1,50 @@
+# TODO - Remarkable OCR
+
+## 🎯 Immediate Actions
+
+### Current Sprint: Project Setup
+- [x] Plan.md review & approval
+- [x] GitHub repository setup
+- [x] Basic documentation (README, LICENSE)
+- [x] Environment configuration template
+- [ ] **NEXT:** Stap 0 implementatie beginnen
+
+### Stap 0: UI-stub & connectiviteit (**M** ~150 regels)
+- [ ] `requirements.txt` met FastAPI dependencies
+- [ ] `app.py` - basic FastAPI setup
+- [ ] `templates/base.html` - basis HTML template
+- [ ] `templates/index.html` - configuratie formulier
+- [ ] `static/style.css` - basis styling
+- [ ] IMAP/SMTP connectiviteit test functie
+- [ ] Error handling & user feedback
+- [ ] Manual testing met dummy email account
+
+### Project Structure Setup
+- [ ] `core/` directory + `__init__.py`
+- [ ] `api/` directory + `__init__.py`
+- [ ] `templates/` directory
+- [ ] `static/` directory
+- [ ] `tests/` directory + `__init__.py`
+- [ ] `docs/` directory
+
+### Git Repository
+- [ ] Git init + initial commit
+- [ ] GitHub repository aanmaken
+- [ ] Remote origin instellen
+- [ ] Push initial codebase
+
+## 📋 Backlog (volgende stappen)
+
+### Stap 1: Mailbox Polling (**M**)
+- [ ] `core/email_handler.py`
+- [ ] `core/models.py`
+- [ ] IMAP monitoring loop
+- [ ] Email parsing & attachment filtering
+
+### Stap 2: OCR Integration (**M**)
+- [ ] `core/ocr_processor.py`
+- [ ] OpenRouter API client
+- [ ] PDF/PNG processing
+
+---
+*Dit bestand wordt bijgewerkt na elke checkpoint.*

@@ -1,0 +1,43 @@
+# ================================================
+# vibe.rules – Global AI Guardrails  (v1.0 – Jul 2025)
+# Inspired by Matthew Berman & r/ChatGPTCoding
+# ================================================
+
+## 1️⃣  Core-Coding Principles
+- KISS → schrijf altijd de simpelst werkende oplossing.
+- DRY  → voorkom duplicaat; hergebruik bestaande functies.
+- SOLID (YAGNI waar relevant) voor onderhoudbare modules.
+- Houd bestanden < 300 regels; refactor zodra je erboven komt.
+- Documenteer iedere major feature kort in `/docs/<feature>.md`.
+
+## 2️⃣  Tech-Stack Guardrails
+- **Backend :**  Python    # pas aan indien nodig
+- **Frontend :** HTML / JavaScript
+- **Data  :** PostgreSQL, SQLite of MariaDB – nooit JSON-files voor prod-data.
+- **Tests   :**  schrijf unit- & edge-case-tests in dezelfde taal.
+- Introduceer géén nieuwe tools zonder expliciete toestemming.
+
+## 3️⃣  Workflow Expectations
+- **Focus :** raak alleen de bestanden die ik opgeef; niets anders.
+- Splits grote taken in checkpoints — na elke stap wacht op review.
+- Voor grote wijzigingen → eerst `plan.md` voor approval.
+- Log voortgang in `progress.md`; volgende acties in `TODO.txt`.
+- Bij > ±100 k tokens → vat samen in `context-summary.md` en herstart.
+
+## 4️⃣  Communicatie-Contract
+- Sluit elke oplevering af met 3-5 bullets “Wat is er gedaan?”.
+- Label impact: **S** (< 50 regels) | **M** (50-300) | **L** (> 300/architectuur).
+- Onzeker? Stel eerst verduidelijkings­vragen.
+- Voor **L**-changes: lever implementatieplan, wacht op go-ahead.
+
+## 5️⃣  Quality & Testing
+- Schrijf volledige tests voor publieke API’s + kritische paden.
+- Mock-data alleen in tests; nooit in dev of prod.
+- Houd antwoorden beknopt; geen overbodige output.
+
+# ===  Appendix: Change-Magnitude Tabel  ==========
+# | Tag | Rijen code | Risico |
+# | S   |   < 50     | laag   |
+# | M   | 50–300     | middel |
+# | L   |   > 300    | hoog   |
+# ================================================
