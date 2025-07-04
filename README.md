@@ -23,7 +23,7 @@ Deze tool monitort een e-mailbox op PDF/PNG bijlagen van Remarkable 2 notities, 
 
 ### Installatie
 ```bash
-git clone https://github.com/[username]/remarkable-ocr.git
+git clone https://github.com/mphagenaars/remarkable-ocr.git
 cd remarkable-ocr
 pip install -r requirements.txt
 cp .env.example .env
