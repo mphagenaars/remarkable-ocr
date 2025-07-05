@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📝 Remarkable 2 naar Tekst Converter</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📝 Remarkable 2 naar Tekst Converter</h1>
+            <p class="subtitle">Configureer je e-mail instellingen om handgeschreven notities automatisch om te zetten naar tekst.</p>
+        </header>
+
+        <main>
+            <div class="form-container">
+                <h2>⚙️ Email Configuratie</h2>
+                
+                <form id="config-form" class="config-form">
+                    <div class="form-group">
+                        <label for="email">📧 E-mailadres:</label>
+                        <input type="email" id="email" name="email" required 
+                               placeholder="je@email.com" autocomplete="email">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">🔐 Wachtwoord/App-wachtwoord:</label>
+                        <input type="password" id="password" name="password" required
+                               placeholder="••••••••••••" autocomplete="current-password">
+                        <small class="help-text">Voor Gmail: gebruik een app-specifiek wachtwoord</small>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="imap_server">📥 IMAP Server:</label>
+                            <input type="text" id="imap_server" name="imap_server" required 
+                                   placeholder="imap.gmail.com" value="imap.gmail.com">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="imap_port">🔌 IMAP Poort:</label>
+                            <input type="number" id="imap_port" name="imap_port" 
+                                   value="993" required min="1" max="65535">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="smtp_server">📤 SMTP Server:</label>
+                            <input type="text" id="smtp_server" name="smtp_server" required 
+                                   placeholder="smtp.gmail.com" value="smtp.gmail.com">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="smtp_port">🔌 SMTP Poort:</label>
+                            <input type="number" id="smtp_port" name="smtp_port" 
+                                   value="587" required min="1" max="65535">
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary" id="test-btn">
+                        🔍 Test Verbinding
+                    </button>
+                </form>
+            </div>
+            
+            <div id="status-container">
+                <div id="status-message"></div>
+            </div>
+            
+            <div class="info-panel">
+                <h3>ℹ️ Populaire E-mail Providers</h3>
+                <div class="provider-grid">
+                    <div class="provider">
+                        <strong>Gmail</strong><br>
+                        IMAP: imap.gmail.com:993<br>
+                        SMTP: smtp.gmail.com:587
+                    </div>
+                    <div class="provider">
+                        <strong>Outlook/Hotmail</strong><br>
+                        IMAP: outlook.office365.com:993<br>
+                        SMTP: smtp-mail.outlook.com:587
+                    </div>
+                    <div class="provider">
+                        <strong>Yahoo</strong><br>
+                        IMAP: imap.mail.yahoo.com:993<br>
+                        SMTP: smtp.mail.yahoo.com:587
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>🚧 MVP Status: Stap 0 - UI stub & connectiviteit test</p>
+        </footer>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

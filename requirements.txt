@@ -1,0 +1,15 @@
+# Core Dependencies
+fastapi==0.104.1
+uvicorn==0.24.0
+jinja2==3.1.2
+python-multipart==0.0.6
+
+# Email & Security
+bcrypt==4.1.2
+cryptography==41.0.8
+
+# HTTP Client for OpenRouter API
+httpx==0.25.2
+
+# Development
+python-dotenv==1.0.0

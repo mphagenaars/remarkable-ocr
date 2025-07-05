@@ -35,7 +35,7 @@ Open `http://localhost:8000` in je browser.
 
 ## 📋 MVP Status
 
-- [ ] **Stap 0:** UI-stub & connectiviteit test
+- [x] **Stap 0:** UI-stub & connectiviteit test
 - [ ] **Stap 1:** Mailbox polling
 - [ ] **Stap 2:** OCR integratie
 - [ ] **Stap 3:** Response workflow

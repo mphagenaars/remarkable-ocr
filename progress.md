@@ -8,6 +8,17 @@
 - ✅ Basis documentatie gemaakt (README.md)
 - ✅ Environment template (.env.example)
 - ✅ Git ignore configuratie
+- ✅ Initial commit gelukt (3d4f465)
+
+### Stap 0: UI-stub & connectiviteit test
+- ✅ Requirements.txt met FastAPI dependencies
+- ✅ Python virtual environment geconfigureerd
+- ✅ app.py - FastAPI hoofdapplicatie (~130 regels)
+- ✅ HTML template met responsive design
+- ✅ CSS styling met moderne UI
+- ✅ JavaScript voor form handling en auto-fill
+- ✅ IMAP/SMTP connectivity testing werkend
+- ✅ Applicatie draait op http://localhost:8000
 - 🚧 **Volgende:** Stap 0 implementatie - UI stub & connectiviteit
 
 ### Files Created
