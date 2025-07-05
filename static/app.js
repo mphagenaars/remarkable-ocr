@@ -33,6 +33,18 @@ document.addEventListener('DOMContentLoaded', function() {
             imap_port: 993,
             smtp_server: 'smtp.mail.yahoo.com',
             smtp_port: 587
+        },
+        'zohomail.eu': {
+            imap_server: 'imap.zoho.eu',
+            imap_port: 993,
+            smtp_server: 'smtp.zoho.eu',
+            smtp_port: 587
+        },
+        'zoho.com': {
+            imap_server: 'imap.zoho.com',
+            imap_port: 993,
+            smtp_server: 'smtp.zoho.com',
+            smtp_port: 587
         }
     };
     
