@@ -18,7 +18,14 @@
 - ✅ CSS styling met moderne UI
 - ✅ JavaScript voor form handling en auto-fill
 - ✅ IMAP/SMTP connectivity testing werkend
-- ✅ Applicatie draait op http://localhost:8000
+### Stap 1: Mailbox polling
+- ✅ EmailHandler class met IMAP monitoring (~200 regels)
+- ✅ Afzender whitelist functionaliteit geïmplementeerd
+- ✅ PDF/PNG attachment filtering
+- ✅ UI uitgebreid met polling controls
+- ✅ Background task polling elke 30 seconden
+- ✅ Start/stop polling API endpoints
+- ✅ Real-time status updates en feedback
 - 🚧 **Volgende:** Stap 0 implementatie - UI stub & connectiviteit
 
 ### Files Created
