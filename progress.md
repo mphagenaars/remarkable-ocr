@@ -29,10 +29,14 @@
 - ✅ **Polling werkend getest** - E-mails worden gelezen, afzender-whitelist werkt
 - ✅ **Stap 1 voltooid!** 
 
-### Stap 2: OCR integratie (RESET)
-- ❌ OCR-code tijdelijk verwijderd wegens startup issues
-- ✅ **Basis polling werkt weer** - App start correct op localhost:8000
-- ✅ UI toegankelijk en functioneel
+### Stap 2: OCR integratie (VOLTOOID)
+- ✅ **OCR-code herschreven met directe PDF support** - Geen pdf2image dependency meer nodig
+- ✅ **OCRProcessor class geoptimaliseerd** - Direct PDF → Gemini 2.5 Flash zonder conversie
+- ✅ **EmailHandler geïntegreerd met OCR** - Automatische processing van PDF/PNG attachments
+- ✅ **Dependencies opgeschoond** - pdf2image en PIL verwijderd voor simpelere stack
+- ✅ **OpenRouter API key UI** - Veld toegevoegd voor OCR configuratie
+- ✅ **App start correct** - OCR integratie werkt zonder startup issues
+- ✅ **Stap 2 voltooid!** - Ready voor attachment processing met Gemini Vision
 - 🚧 **Volgende:** Stap 2 opnieuw - OCR integratie stap voor stap
 
 ### Files Created

@@ -38,6 +38,13 @@
                         <small class="help-text">Comma-gescheiden lijst van email adressen die Remarkable PDF's mogen sturen</small>
                     </div>
                     
+                    <div class="form-group">
+                        <label for="openrouter_api_key">🤖 OpenRouter API Key (Optioneel):</label>
+                        <input type="password" id="openrouter_api_key" name="openrouter_api_key"
+                               placeholder="sk-or-v1-...">
+                        <small class="help-text">Voor OCR functionaliteit. Zonder API key wordt alleen email polling getest.</small>
+                    </div>
+                    
                     <div class="form-row">
                         <div class="form-group">
                             <label for="imap_server">📥 IMAP Server:</label>
@@ -122,7 +129,7 @@
         </main>
         
         <footer>
-            <p>🚧 MVP Status: Stap 0 - UI stub & connectiviteit test</p>
+            <p>🚧 MVP Status: Stap 2 - OCR integratie (bezig)</p>
         </footer>
     </div>
 

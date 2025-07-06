@@ -1,255 +1,243 @@
 """
-Email Handler - IMAP polling en message processing
-Handles mailbox monitoring, attachment filtering, and sender whitelisting
+Email Handler Module voor Remarkable 2 naar Tekst Converter.
+
+Verantwoordelijk voor:
+- IMAP mailbox monitoring 
+- Afzender whitelist validatie
+- PDF/PNG attachment filtering en download
+- Background polling met configureerbare intervallen
 """
 
-import imaplib
-import email
 import ssl
+import email
+import imaplib
 import asyncio
 import logging
-from typing import List, Dict, Optional, Tuple
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
+from typing import List, Dict, Any, Optional, Set
 from dataclasses import dataclass
-from datetime import datetime
-import os
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
-# Setup logging
-logging.basicConfig(level=logging.INFO)
+# Import OCR processor
+from .ocr_processor import OCRProcessor
+
 logger = logging.getLogger(__name__)
 
 
 @dataclass
 class EmailConfig:
-    """Email configuration for IMAP/SMTP"""
-    email_address: str
+    """Email configuratie voor IMAP/SMTP connecties"""
+    email: str
     password: str
     imap_server: str
     imap_port: int
     smtp_server: str
     smtp_port: int
-    allowed_senders: List[str]  # Whitelist van toegestane afzenders
+    allowed_senders: List[str]
+    openrouter_api_key: Optional[str] = None  # OCR API key
 
 
-@dataclass
-class EmailMessage:
-    """Parsed email message met attachment info"""
-    message_id: str
-    sender: str
-    subject: str
-    date: datetime
-    attachments: List[Dict[str, any]]
-    raw_email: email.message.EmailMessage
+def create_email_config(config_data: Dict[str, Any], allowed_senders: List[str]) -> EmailConfig:
+    """Factory function voor EmailConfig"""
+    return EmailConfig(
+        email=config_data["email"],
+        password=config_data["password"],
+        imap_server=config_data["imap_server"],
+        imap_port=config_data["imap_port"],
+        smtp_server=config_data["smtp_server"],
+        smtp_port=config_data["smtp_port"],
+        allowed_senders=allowed_senders,
+        openrouter_api_key=config_data.get("openrouter_api_key")
+    )
+
+
+def validate_email_config(config: EmailConfig) -> tuple[bool, Optional[str]]:
+    """Valideer email configuratie"""
+    if not config.email or "@" not in config.email:
+        return False, "Ongeldig email adres"
+    
+    if not config.password:
+        return False, "Wachtwoord is vereist"
+    
+    if not config.allowed_senders:
+        return False, "Minimaal één toegestane afzender vereist"
+    
+    return True, None
 
 
 class EmailHandler:
-    """Handles IMAP polling en email processing"""
+    """Handles email monitoring en attachment processing"""
     
     def __init__(self, config: EmailConfig):
         self.config = config
         self.is_polling = False
-        self.processed_messages = set()  # Track verwerkte message IDs
+        self.processed_messages: Set[str] = set()
+        self._polling_task: Optional[asyncio.Task] = None
         
-    async def start_polling(self, poll_interval: int = 30) -> None:
-        """Start continuous mailbox polling"""
-        logger.info(f"Starting email polling every {poll_interval} seconds")
-        logger.info(f"Allowed senders: {', '.join(self.config.allowed_senders)}")
+        # Initialize OCR processor if API key is available
+        self.ocr_processor: Optional[OCRProcessor] = None
+        if config.openrouter_api_key:
+            self.ocr_processor = OCRProcessor(
+                api_key=config.openrouter_api_key,
+                model="google/gemini-pro-vision"  # Default model
+            )
+            logger.info(f"OCR processor initialized for {config.email}")
+        else:
+            logger.warning(f"No OpenRouter API key provided for {config.email}, OCR disabled")
         
+    async def start_polling(self, interval_seconds: int = 30):
+        """Start background polling van mailbox"""
+        if self.is_polling:
+            logger.warning(f"Polling already active for {self.config.email}")
+            return
+            
         self.is_polling = True
+        logger.info(f"Starting email polling for {self.config.email} every {interval_seconds}s")
+        
+        self._polling_task = asyncio.create_task(self._poll_loop(interval_seconds))
+        
+    async def _poll_loop(self, interval_seconds: int):
+        """Main polling loop"""
         while self.is_polling:
             try:
-                await self._check_mailbox()
-                await asyncio.sleep(poll_interval)
+                await self._check_new_emails()
+                await asyncio.sleep(interval_seconds)
             except Exception as e:
-                logger.error(f"Polling error: {e}")
-                await asyncio.sleep(poll_interval * 2)  # Longer wait on error
-    
-    def stop_polling(self) -> None:
-        """Stop mailbox polling"""
-        logger.info("Stopping email polling")
-        self.is_polling = False
-    
-    async def _check_mailbox(self) -> List[EmailMessage]:
-        """Check for new emails with attachments from allowed senders"""
+                logger.error(f"Polling error for {self.config.email}: {e}")
+                await asyncio.sleep(interval_seconds)  # Continue polling despite errors
+                
+    async def _check_new_emails(self):
+        """Check for new emails from allowed senders with attachments"""
         try:
             context = ssl.create_default_context()
             
-            with imaplib.IMAP4_SSL(self.config.imap_server, self.config.imap_port, 
-                                  ssl_context=context) as imap:
-                imap.login(self.config.email_address, self.config.password)
+            with imaplib.IMAP4_SSL(self.config.imap_server, self.config.imap_port, ssl_context=context) as imap:
+                imap.login(self.config.email, self.config.password)
                 imap.select("INBOX")
                 
-                # Search for recent unread emails
+                # Search for unread emails
                 status, messages = imap.search(None, "UNSEEN")
                 
-                if status != "OK" or not messages[0]:
-                    logger.debug("No new messages found")
-                    return []
-                
-                message_ids = messages[0].split()
-                new_messages = []
-                
-                for msg_id in message_ids:
-                    try:
-                        parsed_msg = await self._process_message(imap, msg_id)
-                        if parsed_msg:
-                            new_messages.append(parsed_msg)
-                    except Exception as e:
-                        logger.error(f"Error processing message {msg_id}: {e}")
-                
-                if new_messages:
-                    logger.info(f"Found {len(new_messages)} new messages to process")
-                
-                return new_messages
-                
+                if status == "OK" and messages[0]:
+                    message_ids = messages[0].split()
+                    logger.info(f"Found {len(message_ids)} unread emails for {self.config.email}")
+                    
+                    for msg_id in message_ids:
+                        msg_id_str = msg_id.decode()
+                        
+                        if msg_id_str in self.processed_messages:
+                            continue
+                            
+                        await self._process_email(imap, msg_id_str)
+                        self.processed_messages.add(msg_id_str)
+                        
         except Exception as e:
-            logger.error(f"Mailbox check error: {e}")
-            raise
-    
-    async def _process_message(self, imap: imaplib.IMAP4_SSL, 
-                              msg_id: bytes) -> Optional[EmailMessage]:
-        """Process single email message"""
+            logger.error(f"Email check failed for {self.config.email}: {e}")
+            
+    async def _process_email(self, imap: imaplib.IMAP4_SSL, msg_id: str):
+        """Process individual email for attachments"""
         try:
-            # Fetch message
+            # Fetch email
             status, msg_data = imap.fetch(msg_id, "(RFC822)")
+            
             if status != "OK":
-                return None
+                return
+                
+            email_body = msg_data[0][1]
+            email_message = email.message_from_bytes(email_body)
             
-            raw_email = email.message_from_bytes(msg_data[0][1])
+            # Check sender
+            sender = email_message.get("From", "")
+            sender_email = self._extract_email_address(sender)
             
-            # Extract basic info
-            sender = self._extract_email_address(raw_email.get("From", ""))
-            subject = raw_email.get("Subject", "")
-            message_id = raw_email.get("Message-ID", "")
-            date_str = raw_email.get("Date", "")
+            if not self._is_allowed_sender(sender_email):
+                logger.info(f"Ignoring email from non-whitelisted sender: {sender_email}")
+                return
+                
+            logger.info(f"Processing email from allowed sender: {sender_email}")
             
-            # Skip if already processed
-            if message_id in self.processed_messages:
-                logger.debug(f"Message {message_id} already processed")
-                return None
+            # Look for PDF/PNG attachments
+            attachments = self._extract_attachments(email_message)
             
-            # Check sender whitelist
-            if not self._is_sender_allowed(sender):
-                logger.warning(f"Email from {sender} blocked - not in whitelist")
-                return None
-            
-            # Extract attachments
-            attachments = self._extract_attachments(raw_email)
-            
-            # Only process emails with PDF/PNG attachments
-            if not self._has_valid_attachments(attachments):
-                logger.info(f"Email from {sender} has no valid attachments (PDF/PNG)")
-                return None
-            
-            # Parse date
-            try:
-                msg_date = email.utils.parsedate_to_datetime(date_str)
-            except:
-                msg_date = datetime.now()
-            
-            # Mark as processed
-            self.processed_messages.add(message_id)
-            
-            logger.info(f"Processing email from {sender}: {subject}")
-            logger.info(f"Found {len(attachments)} valid attachments")
-            
-            return EmailMessage(
-                message_id=message_id,
-                sender=sender,
-                subject=subject,
-                date=msg_date,
-                attachments=attachments,
-                raw_email=raw_email
-            )
-            
-        except Exception as e:
-            logger.error(f"Message processing error: {e}")
-            return None
-    
-    def _is_sender_allowed(self, sender: str) -> bool:
-        """Check if sender is in whitelist"""
-        sender_clean = sender.lower().strip()
-        
-        for allowed in self.config.allowed_senders:
-            if allowed.lower().strip() in sender_clean:
-                return True
-        
-        return False
-    
-    def _extract_email_address(self, from_header: str) -> str:
-        """Extract clean email address from From header"""
-        try:
-            # Handle formats like: "Name <email@domain.com>" or "email@domain.com"
-            if "<" in from_header and ">" in from_header:
-                return from_header.split("<")[1].split(">")[0].strip()
+            if attachments:
+                logger.info(f"Found {len(attachments)} attachments in email from {sender_email}")
+                
+                # Process attachments with OCR if available
+                if self.ocr_processor:
+                    await self._process_attachments_with_ocr(attachments, sender_email)
+                else:
+                    logger.warning("OCR processor not available, skipping text extraction")
+                    for attachment in attachments:
+                        logger.info(f"Attachment found: {attachment['filename']} ({attachment['content_type']})")
             else:
-                return from_header.strip()
-        except:
-            return from_header.strip()
+                logger.info(f"No PDF/PNG attachments found in email from {sender_email}")
+                
+        except Exception as e:
+            logger.error(f"Failed to process email {msg_id}: {e}")
     
-    def _extract_attachments(self, msg: email.message.EmailMessage) -> List[Dict]:
+    async def _process_attachments_with_ocr(self, attachments: List[Dict[str, Any]], sender_email: str):
+        """Process attachments with OCR and log results"""
+        for attachment in attachments:
+            try:
+                filename = attachment['filename']
+                file_data = attachment['data']
+                
+                logger.info(f"Starting OCR processing for: {filename}")
+                
+                # Process with OCR
+                ocr_result = await self.ocr_processor.process_attachment(filename, file_data)
+                
+                if ocr_result['success']:
+                    logger.info(f"OCR successful for {filename}: {len(ocr_result['text'])} characters extracted")
+                    logger.info(f"OCR confidence: {ocr_result['confidence']}")
+                    
+                    # Log first 200 chars of extracted text for debugging
+                    preview_text = ocr_result['text'][:200] + "..." if len(ocr_result['text']) > 200 else ocr_result['text']
+                    logger.info(f"Extracted text preview: {preview_text}")
+                    
+                    # TODO: In later steps, save to database and send response email
+                    
+                else:
+                    logger.error(f"OCR failed for {filename}: {ocr_result.get('error', 'Unknown error')}")
+                    
+            except Exception as e:
+                logger.error(f"Exception during OCR processing of {attachment['filename']}: {e}")
+            
+    def _extract_email_address(self, sender: str) -> str:
+        """Extract email address from sender field"""
+        if "<" in sender and ">" in sender:
+            start = sender.find("<") + 1
+            end = sender.find(">")
+            return sender[start:end].lower().strip()
+        return sender.lower().strip()
+        
+    def _is_allowed_sender(self, sender_email: str) -> bool:
+        """Check if sender is in whitelist"""
+        return sender_email in [s.lower().strip() for s in self.config.allowed_senders]
+        
+    def _extract_attachments(self, email_message) -> List[Dict[str, Any]]:
         """Extract PDF/PNG attachments from email"""
         attachments = []
         
-        for part in msg.walk():
-            if part.get_content_disposition() == "attachment":
+        for part in email_message.walk():
+            content_type = part.get_content_type()
+            content_disposition = str(part.get("Content-Disposition", ""))
+            
+            # Check for PDF or PNG attachments
+            if content_type in ["application/pdf", "image/png"] and "attachment" in content_disposition:
                 filename = part.get_filename()
-                
-                if filename and self._is_valid_file_type(filename):
+                if filename:
                     attachments.append({
                         "filename": filename,
-                        "content_type": part.get_content_type(),
-                        "size": len(part.get_payload(decode=True) or b""),
+                        "content_type": content_type,
                         "data": part.get_payload(decode=True)
                     })
-        
+                    
         return attachments
-    
-    def _is_valid_file_type(self, filename: str) -> bool:
-        """Check if file is PDF or PNG"""
-        filename_lower = filename.lower()
-        return filename_lower.endswith(('.pdf', '.png', '.jpg', '.jpeg'))
-    
-    def _has_valid_attachments(self, attachments: List[Dict]) -> bool:
-        """Check if email has at least one valid attachment"""
-        return len(attachments) > 0
-    
-    async def mark_as_processed(self, message_id: str) -> None:
-        """Mark message as processed to avoid reprocessing"""
-        self.processed_messages.add(message_id)
-        logger.debug(f"Marked message {message_id} as processed")
-
-
-# Helper functions for email config management
-def create_email_config(email_data: Dict, allowed_senders: List[str]) -> EmailConfig:
-    """Create EmailConfig from form data"""
-    return EmailConfig(
-        email_address=email_data["email"],
-        password=email_data["password"],
-        imap_server=email_data["imap_server"],
-        imap_port=int(email_data["imap_port"]),
-        smtp_server=email_data["smtp_server"],
-        smtp_port=int(email_data["smtp_port"]),
-        allowed_senders=allowed_senders
-    )
-
-
-def validate_email_config(config: EmailConfig) -> Tuple[bool, str]:
-    """Validate email configuration"""
-    if not config.email_address or "@" not in config.email_address:
-        return False, "Invalid email address"
-    
-    if not config.password:
-        return False, "Password is required"
-    
-    if not config.allowed_senders:
-        return False, "At least one allowed sender must be specified"
-    
-    if not (1 <= config.imap_port <= 65535):
-        return False, "Invalid IMAP port"
-    
-    if not (1 <= config.smtp_port <= 65535):
-        return False, "Invalid SMTP port"
-    
-    return True, "Configuration valid"
+        
+    def stop_polling(self):
+        """Stop polling"""
+        self.is_polling = False
+        if self._polling_task:
+            self._polling_task.cancel()
+        logger.info(f"Stopped polling for {self.config.email}")
