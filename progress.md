@@ -26,7 +26,14 @@
 - ✅ Background task polling elke 30 seconden
 - ✅ Start/stop polling API endpoints
 - ✅ Real-time status updates en feedback
-- 🚧 **Volgende:** Stap 0 implementatie - UI stub & connectiviteit
+- ✅ **Polling werkend getest** - E-mails worden gelezen, afzender-whitelist werkt
+- ✅ **Stap 1 voltooid!** 
+
+### Stap 2: OCR integratie (RESET)
+- ❌ OCR-code tijdelijk verwijderd wegens startup issues
+- ✅ **Basis polling werkt weer** - App start correct op localhost:8000
+- ✅ UI toegankelijk en functioneel
+- 🚧 **Volgende:** Stap 2 opnieuw - OCR integratie stap voor stap
 
 ### Files Created
 - `README.md` - Project documentatie
