@@ -8,7 +8,14 @@ Deze tool monitort een e-mailbox op PDF/PNG bijlagen van Remarkable 2 notities, 
 
 ## ✨ Features
 
+### ✅ Werkend (v0.1.0)
 - **Email monitoring:** Automatische IMAP polling voor nieuwe berichten
+- **Sender whitelist:** Alleen emails van toegestane afzenders
+- **Attachment filtering:** PDF/PNG detectie en extractie
+- **UI configuratie:** Web interface voor email setup
+- **Real-time status:** Live polling controls en feedback
+
+### 🚧 In ontwikkeling  
 - **OCR processing:** Nederlandse tekst extractie via Google Gemini 2.5 Flash
 - **Response workflow:** Geautomatiseerde terugkoppeling met geëxtraheerde tekst
 - **Multi-user support:** Admin interface voor gebruikersbeheer

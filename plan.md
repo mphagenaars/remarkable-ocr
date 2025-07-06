@@ -8,14 +8,14 @@
 ## 📋 MVP Backlog (from spec)
 Gebaseerd op de UI-first approach uit je specificatie:
 
-### Stap 0: UI-stub & connectiviteit (**M**)
+### Stap 0: UI-stub & connectiviteit (**M**) ✅
 - Minimale webpagina (FastAPI + HTML/JS)
 - IMAP/SMTP configuratie formulier
 - "Test verbinding" functionaliteit
 - **Files:** `app.py`, `templates/index.html`, `requirements.txt`
 - **~150 regels**
 
-### Stap 1: Mailbox polling (**M**)
+### Stap 1: Mailbox polling (**M**) ✅
 - IMAP monitoring voor nieuwe emails
 - Filter op bijlagen (PDF/PNG)
 - Basis email parsing
