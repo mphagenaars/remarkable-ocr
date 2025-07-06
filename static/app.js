@@ -10,6 +10,18 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentEmail = null;
     let pollingActive = false;
     
+    // Add polling button listeners immediately
+    const startPollingBtn = document.getElementById('start-polling-btn');
+    const stopPollingBtn = document.getElementById('stop-polling-btn');
+    
+    if (startPollingBtn) {
+        startPollingBtn.addEventListener('click', startPolling);
+    }
+    
+    if (stopPollingBtn) {
+        stopPollingBtn.addEventListener('click', stopPolling);
+    }
+    
     // Pre-fill common provider settings
     const providerPresets = {
         'gmail.com': {

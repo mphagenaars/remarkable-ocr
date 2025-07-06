@@ -237,6 +237,25 @@ async def get_polling_status(email: str):
     }
 
 
+@app.get("/debug/polling")
+async def debug_polling():
+    """Debug endpoint voor polling status"""
+    debug_info = {
+        "active_handlers": len(active_handlers),
+        "configured_users": len(user_configs),
+        "handlers": {}
+    }
+    
+    for email, handler in active_handlers.items():
+        debug_info["handlers"][email] = {
+            "is_polling": handler.is_polling,
+            "processed_messages": len(handler.processed_messages),
+            "allowed_senders": handler.config.allowed_senders
+        }
+    
+    return JSONResponse(debug_info)
+
+
 @app.get("/health")
 async def health_check():
     """Health check endpoint voor monitoring"""

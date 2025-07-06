@@ -76,6 +76,24 @@
                 <div id="status-message"></div>
             </div>
             
+            <!-- Debug: Always show polling controls -->
+            <div id="polling-controls" class="polling-controls">
+                <h3>📧 Mailbox Monitoring</h3>
+                <p><strong>Stap 1:</strong> Test eerst de verbinding hierboven ☝️</p>
+                <p><strong>Stap 2:</strong> Start dan de polling om nieuwe emails te monitoren</p>
+                <div class="polling-buttons">
+                    <button type="button" id="start-polling-btn" class="btn-primary">
+                        ▶️ Start Polling
+                    </button>
+                    <button type="button" id="stop-polling-btn" class="btn-secondary" style="display: none;">
+                        ⏹️ Stop Polling
+                    </button>
+                </div>
+                <div id="polling-status" class="polling-status">
+                    <div class="status-inactive">⚪ Test eerst de verbinding voordat je polling start</div>
+                </div>
+            </div>
+            
             <div class="info-panel">
                 <h3>ℹ️ Populaire E-mail Providers</h3>
                 <div class="provider-grid">
