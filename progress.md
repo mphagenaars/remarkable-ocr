@@ -37,7 +37,11 @@
 - ✅ **OpenRouter API key UI** - Veld toegevoegd voor OCR configuratie
 - ✅ **App start correct** - OCR integratie werkt zonder startup issues
 - ✅ **Stap 2 voltooid!** - Ready voor attachment processing met Gemini Vision
-- 🚧 **Volgende:** Stap 2 opnieuw - OCR integratie stap voor stap
+
+### Stap 3: Response workflow (PLANNING)
+- 🚧 **Planning document opgesteld** - Gedetailleerd plan voor resultaatverwerking en notificaties
+- 🚧 **Checkpoint 1 gedefinieerd** - Focus op NotificationHandler implementatie
+- 🚧 **Volgende:** Implementatie van NotificationHandler en email templates
 
 ### Files Created
 - `README.md` - Project documentatie
@@ -45,9 +49,12 @@
 - `.gitignore` - Git ignore patterns
 - `LICENSE` - MIT license
 - `progress.md` - Dit bestand
+- `docs/ocr-feature.md` - OCR feature documentatie
+- `docs/stap3-plan.md` - Plan voor Stap 3
+- `docs/stap3-checkpoint1.md` - Specifiek plan voor eerste checkpoint
 
 ### Next Checkpoint
-**Stap 0: UI-stub & connectiviteit**
+**Stap 3: Response workflow - Checkpoint 1**
 - FastAPI setup
 - HTML template voor email configuratie
 - IMAP/SMTP test functionaliteit
