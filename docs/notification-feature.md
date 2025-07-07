@@ -25,15 +25,25 @@ De centrale component die verantwoordelijk is voor:
 ## API
 
 ```python
+# Initialisatie met notificatie-emailadres
+notification = NotificationHandler(smtp_config, notification_email="user@example.com")
+
 # Basis gebruik
-notification = NotificationHandler(smtp_config)
-success = await notification.send_ocr_result(recipient, ocr_result)
+success = await notification.send_ocr_result(ocr_result)
+
+# Notificatie-emailadres aanpassen
+notification.set_notification_email("new_address@example.com")
 
 # Met originele bijlage
 success = await notification.send_ocr_result(
-    recipient, 
     ocr_result,
     original_attachment=pdf_bytes
+)
+
+# Met specifieke ontvanger (override default)
+success = await notification.send_ocr_result(
+    ocr_result,
+    recipient="specific_user@example.com"
 )
 
 # Configuratie-opties
@@ -51,6 +61,7 @@ notification.enable_attachments(True)
 - EmailHandler levert OCR resultaten aan NotificationHandler
 - NotificationHandler gebruikt bestaande SMTP configuratie
 - App.py biedt configuratie-endpoints voor notificatie-instellingen
+- Notificatie-emailadres configuratie onafhankelijk van monitoring emailadres
 
 ## Toekomstige Uitbreidingen
 - Database-opslag van verzonden notificaties

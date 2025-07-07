@@ -5,6 +5,7 @@
 ### 1. Basis NotificationHandler Module
 - [ ] Creëer `core/notification_handler.py`
 - [ ] Implementeer `NotificationHandler` klasse met basis structuur
+- [ ] Voeg configuratie voor notificatie-emailadres toe
 - [ ] Implementeer `format_ocr_result()` functie voor tekstformattering
 - [ ] Implementeer `prepare_email()` voor email content generatie
 
@@ -20,7 +21,8 @@
 
 ### 4. App.py Integratie
 - [ ] Update OCR verwerking in EmailHandler om NotificationHandler te gebruiken
-- [ ] Voeg configuratie-opties toe voor notificaties
+- [ ] Voeg configuratie-opties toe voor notificaties inclusief notificatie-emailadres
+- [ ] Voeg API endpoint toe voor het instellen van het notificatie-emailadres
 - [ ] Zorg voor juiste error handling en logging
 
 ## 🧪 Unit Tests
@@ -32,6 +34,23 @@
 
 ### NotificationHandler API
 ```python
+def __init__(self, smtp_config, notification_email=None):
+    """Initialize notification handler.
+    
+    Args:
+        smtp_config (dict): SMTP server configuration
+        notification_email (str, optional): Default notification email address
+    """
+    # Implementatie...
+
+def set_notification_email(self, email):
+    """Set or update the notification email address.
+    
+    Args:
+        email (str): Email address for notifications
+    """
+    # Implementatie...
+
 async def format_ocr_result(self, ocr_result):
     """Format OCR result text for better readability.
     
@@ -56,17 +75,19 @@ async def prepare_email(self, recipient, formatted_result, original_filename):
     """
     # Implementatie...
 
-async def send_ocr_result(self, recipient, ocr_result, original_attachment=None):
+async def send_ocr_result(self, ocr_result, original_attachment=None, recipient=None):
     """Send OCR results via email.
     
     Args:
-        recipient (str): Recipient email
         ocr_result (dict): OCR processor result
         original_attachment (bytes, optional): Original file
+        recipient (str, optional): Custom recipient (overrides default notification_email)
         
     Returns:
         bool: Success status
     """
+    # Use default notification_email if recipient not specified
+    target_email = recipient or self.notification_email
     # Implementatie...
 ```
 

@@ -27,6 +27,7 @@ Implementeren van de resultaatverwerking en notificatie workflow voor het automa
 - **Technische details:**
   - SMTP client integratie (hergebruik bestaande code)
   - Jinja2 templates voor resultaat emails
+  - Configureerbaar notificatie-emailadres (apart van monitoring email)
   - Optie voor bijlage van originele documenten
   - Error logging en retry mechanisme
 - **Bestanden:** `core/notification_handler.py`, `templates/email_response.html`
@@ -42,7 +43,8 @@ Implementeren van de resultaatverwerking en notificatie workflow voor het automa
 ### 4. Gebruikersinterface Aanpassingen (10%)
 - **Functionaliteit:** UI updates voor notificatie configuratie
 - **Technische details:**
-  - Formulier elementen voor notificatie instellingen
+  - Formulier elementen voor notificatie-emailadres
+  - Configuratie-opties voor notificatie voorkeuren
   - Status indicators voor verwerkte documenten
   - JavaScript voor async status updates
 - **Bestanden:** `templates/index.html`, `static/app.js`
@@ -77,12 +79,30 @@ Implementeren van de resultaatverwerking en notificatie workflow voor het automa
 class NotificationHandler:
     """Handles OCR result notifications via email."""
     
-    def __init__(self, smtp_config):
-        """Initialize with SMTP configuration."""
-        self.smtp_config = smtp_config
+    def __init__(self, smtp_config, notification_email=None):
+        """Initialize with SMTP configuration and optional notification email.
         
-    async def send_ocr_result(self, recipient, ocr_result, original_attachment=None):
-        """Send OCR results to recipient."""
+        Args:
+            smtp_config: SMTP server configuration
+            notification_email: Optional target email for notifications
+        """
+        self.smtp_config = smtp_config
+        self.notification_email = notification_email
+        
+    def set_notification_email(self, email):
+        """Set or update the notification email address."""
+        self.notification_email = email
+        
+    async def send_ocr_result(self, ocr_result, original_attachment=None, recipient=None):
+        """Send OCR results via email.
+        
+        Args:
+            ocr_result: OCR processing results
+            original_attachment: Optional original document
+            recipient: Optional recipient (overrides default notification_email)
+        """
+        # Use configured notification_email if recipient not specified
+        target_email = recipient or self.notification_email
         # Format and send email with results
         pass
         
