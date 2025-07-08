@@ -22,14 +22,14 @@ Gebaseerd op de UI-first approach uit je specificatie:
 - **Files:** `core/email_handler.py`, `core/models.py`
 - **~200 regels**
 
-### Stap 2: OCR integratie (**M**)
+### Stap 2: OCR integratie (**M**) ✅
 - OpenRouter API (google/gemini-2.5-flash)
 - PDF/PNG naar tekst conversie
 - Nederlandse tekst optimalisatie
 - **Files:** `core/ocr_processor.py`
 - **~100 regels**
 
-### Stap 3: Response workflow (**S**)
+### Stap 3: Response workflow (**S**) ✅
 - Email terugsturen met geëxtraheerde tekst
 - Originele bijlage behouden
 - Template voor response emails
@@ -49,6 +49,19 @@ Gebaseerd op de UI-first approach uit je specificatie:
 - Status dashboard
 - **Files:** `templates/admin.html`, `api/admin.py`
 - **~200 regels**
+
+## 🎉 **MVP Core Complete!**
+**Status:** Email → OCR → Response pipeline werkend  
+**Datum:** Juli 8, 2025  
+**Volgende:** Database & persistence (Stap 4)
+
+### Bereikt:
+- ✅ UI-stub met FastAPI
+- ✅ Email polling & parsing
+- ✅ OCR met Gemini 2.5 Flash
+- ✅ Response email workflow
+
+### Stap 4: Database & persistence (**M**) 🚧 NEXT
 
 ## 🏗️ Architecture Design
 
