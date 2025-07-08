@@ -8,6 +8,7 @@ import ssl
 import imaplib
 import smtplib
 import asyncio
+import logging
 from typing import Dict, Any
 from fastapi import FastAPI, Request, Form, HTTPException, BackgroundTasks
 from fastapi.templating import Jinja2Templates
@@ -15,11 +16,15 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, JSONResponse
 from dotenv import load_dotenv
 
-# Import our email handler
+# Import our handlers
 from core.email_handler import EmailHandler, EmailConfig, create_email_config, validate_email_config
+from core.notification_handler import NotificationHandler
 
 # Load environment variables
 load_dotenv()
+
+# Setup logging
+logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="Remarkable 2 naar Tekst Converter",
@@ -37,6 +42,9 @@ user_configs: Dict[str, Dict[str, Any]] = {}
 # Active email handlers
 active_handlers: Dict[str, EmailHandler] = {}
 
+# Active notification handlers
+notification_handlers: Dict[str, NotificationHandler] = {}
+
 
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
@@ -53,7 +61,9 @@ async def test_connection(
     smtp_server: str = Form(...),
     smtp_port: int = Form(587),
     allowed_senders: str = Form(...),
-    openrouter_api_key: str = Form("")  # Optional OCR API key
+    openrouter_api_key: str = Form(""),  # Optional OCR API key
+    notification_email: str = Form(""),  # Optional notification email
+    sender_email: str = Form("")  # Optional separate sender email
 ):
     """Test IMAP en SMTP connectiviteit volgens MVP spec"""
     try:
@@ -91,7 +101,9 @@ async def test_connection(
             "smtp_port": smtp_port,
             "allowed_senders": sender_list,
             "openrouter_api_key": openrouter_api_key.strip() if openrouter_api_key else None,
-            "status": "connected"
+            "status": "connected",
+            "notification_email": notification_email.strip() if notification_email else None,
+            "sender_email": sender_email.strip() if sender_email else None
         }
         
         # Create status message with OCR info
@@ -161,6 +173,31 @@ async def start_polling(
         # Create and start handler
         handler = EmailHandler(email_config)
         active_handlers[email] = handler
+        
+        # Initialize notification handler if notification email is set
+        notification_email = user_configs[email].get("notification_email")
+        sender_email = user_configs[email].get("sender_email")
+        if notification_email:
+            # Create SMTP config for notification handler
+            smtp_config = {
+                "email": email,
+                "password": user_configs[email]["password"],
+                "smtp_server": user_configs[email]["smtp_server"],
+                "smtp_port": user_configs[email]["smtp_port"]
+            }
+            
+            # Create notification handler
+            notification_handler = NotificationHandler(
+                smtp_config, 
+                notification_email, 
+                sender_email
+            )
+            notification_handlers[email] = notification_handler
+            
+            target_info = f"target: {notification_email}"
+            if sender_email:
+                target_info += f", sender: {sender_email}"
+            print(f"Notification handler initialized for {email} with {target_info}")
         
         # Start polling in background
         background_tasks.add_task(handler.start_polling, 30)  # Poll every 30 seconds
@@ -265,6 +302,83 @@ async def debug_polling():
 async def health_check():
     """Health check endpoint voor monitoring"""
     return {"status": "healthy", "service": "remarkable-ocr"}
+
+
+@app.post("/set-notification-email")
+async def set_notification_email(
+    email: str = Form(...),
+    notification_email: str = Form(...)
+):
+    """Stel notificatie-emailadres in voor gebruiker"""
+    if email not in user_configs:
+        return JSONResponse({
+            "status": "error",
+            "message": "❌ Email niet geconfigureerd",
+            "details": "Configureer eerst je email-instellingen"
+        }, status_code=400)
+    
+    try:
+        # Update config
+        user_configs[email]["notification_email"] = notification_email
+        
+        # Update notification handler if it exists
+        if email in notification_handlers:
+            notification_handlers[email].set_notification_email(notification_email)
+        else:
+            # Create notification handler with SMTP config
+            smtp_config = {
+                "email": user_configs[email]["email"],
+                "password": user_configs[email]["password"],
+                "smtp_server": user_configs[email]["smtp_server"],
+                "smtp_port": user_configs[email]["smtp_port"],
+            }
+            notification_handlers[email] = NotificationHandler(smtp_config, notification_email)
+        
+        return JSONResponse({
+            "status": "success",
+            "message": f"✅ Notificatie-emailadres ingesteld: {notification_email}",
+            "details": "OCR resultaten worden naar dit adres gestuurd"
+        })
+        
+    except Exception as e:
+        return JSONResponse({
+            "status": "error",
+            "message": f"❌ Fout bij instellen notificatie-email: {str(e)}"
+        }, status_code=500)
+
+
+@app.post("/set-sender-email")
+async def set_sender_email(
+    email: str = Form(...),
+    sender_email: str = Form(...)
+):
+    """Stel een apart verzendadres in voor gebruiker"""
+    if email not in user_configs:
+        return JSONResponse({
+            "status": "error",
+            "message": "❌ Email niet geconfigureerd",
+            "details": "Configureer eerst je email-instellingen"
+        }, status_code=400)
+    
+    try:
+        # Update config
+        user_configs[email]["sender_email"] = sender_email
+        
+        # Update notification handler if it exists
+        if email in notification_handlers:
+            notification_handlers[email].set_sender_email(sender_email)
+        
+        return JSONResponse({
+            "status": "success",
+            "message": f"✅ Verzendadres ingesteld: {sender_email}",
+            "details": "OCR resultaten worden vanuit dit adres verzonden"
+        })
+        
+    except Exception as e:
+        return JSONResponse({
+            "status": "error",
+            "message": f"❌ Fout bij instellen verzendadres: {str(e)}"
+        }, status_code=500)
 
 
 if __name__ == "__main__":

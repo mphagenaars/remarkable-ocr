@@ -79,7 +79,7 @@ class EmailHandler:
         if config.openrouter_api_key:
             self.ocr_processor = OCRProcessor(
                 api_key=config.openrouter_api_key,
-                model="google/gemini-pro-vision"  # Default model
+                model="google/gemini-2.5-flash"  # Werkende model
             )
             logger.info(f"OCR processor initialized for {config.email}")
         else:
@@ -195,7 +195,33 @@ class EmailHandler:
                     preview_text = ocr_result['text'][:200] + "..." if len(ocr_result['text']) > 200 else ocr_result['text']
                     logger.info(f"Extracted text preview: {preview_text}")
                     
-                    # TODO: In later steps, save to database and send response email
+                    # Send notification if notification handler is available
+                    from app import notification_handlers
+                    user_email = self.config.email
+                    
+                    if user_email in notification_handlers:
+                        notification_handler = notification_handlers[user_email]
+                        
+                        # Try to send notification
+                        try:
+                            # Include filename in OCR result
+                            ocr_result['filename'] = filename
+                            
+                            # Send notification with original attachment
+                            success = await notification_handler.send_ocr_result(
+                                ocr_result,
+                                original_attachment=file_data
+                            )
+                            
+                            if success:
+                                logger.info(f"OCR notification sent successfully for {filename}")
+                            else:
+                                logger.error(f"Failed to send OCR notification for {filename}")
+                                
+                        except Exception as e:
+                            logger.error(f"Error sending OCR notification: {e}")
+                    else:
+                        logger.info(f"No notification handler available for {user_email}, skipping notification")
                     
                 else:
                     logger.error(f"OCR failed for {filename}: {ocr_result.get('error', 'Unknown error')}")

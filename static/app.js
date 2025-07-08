@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const configForm = document.getElementById('config-form');
     const statusContainer = document.getElementById('status-message');
     const testButton = document.getElementById('test-btn');
+    const notificationForm = document.getElementById('notification-form');
+    const senderForm = document.getElementById('sender-form');
     let currentEmail = null;
     let pollingActive = false;
     
@@ -195,6 +197,70 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
+    // Setup notification email form handler
+    if (notificationForm) {
+        notificationForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!currentEmail) {
+                showMessage('error', '❌ Configureer eerst je email instellingen');
+                return;
+            }
+            
+            const formData = new FormData(notificationForm);
+            formData.set('email', currentEmail); // Ensure current email is set
+            
+            try {
+                const response = await fetch('/set-notification-email', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.status === 'success') {
+                    showMessage('success', result.message);
+                } else {
+                    showMessage('error', result.message);
+                }
+            } catch (error) {
+                showMessage('error', `❌ Fout bij instellen notificatie-email: ${error.message}`);
+            }
+        });
+    }
+    
+    // Setup sender email form handler
+    if (senderForm) {
+        senderForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!currentEmail) {
+                showMessage('error', '❌ Configureer eerst je email instellingen');
+                return;
+            }
+            
+            const formData = new FormData(senderForm);
+            formData.set('email', currentEmail); // Ensure current email is set
+            
+            try {
+                const response = await fetch('/set-sender-email', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.status === 'success') {
+                    showMessage('success', result.message);
+                } else {
+                    showMessage('error', result.message);
+                }
+            } catch (error) {
+                showMessage('error', `❌ Fout bij instellen verzendadres: ${error.message}`);
+            }
+        });
+    }
+    
     // Real-time port validation
     document.querySelectorAll('input[type="number"]').forEach(input => {
         input.addEventListener('input', function() {
@@ -220,7 +286,7 @@ document.addEventListener('DOMContentLoaded', function() {
         controlsDiv.id = 'polling-controls';
         controlsDiv.className = 'polling-controls';
         controlsDiv.innerHTML = `
-            <h3>� Mailbox Monitoring</h3>
+            <h3>📧 Mailbox Monitoring</h3>
             <p>Start automatische polling om nieuwe Remarkable PDF's te verwerken.</p>
             <div class="polling-buttons">
                 <button type="button" id="start-polling-btn" class="btn-primary">
@@ -232,6 +298,16 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             <div id="polling-status" class="polling-status"></div>
         `;
+        
+        // Show notification controls
+        const notificationControls = document.getElementById('notification-controls');
+        if (notificationControls) {
+            notificationControls.style.display = 'block';
+            
+            // Set hidden email fields to current email
+            document.getElementById('notification_account').value = currentEmail;
+            document.getElementById('sender_account').value = currentEmail;
+        }
         
         // Insert after form container
         const formContainer = document.querySelector('.form-container');

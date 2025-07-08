@@ -148,6 +148,24 @@ input:focus {
     transform: none;
 }
 
+.btn-secondary {
+    background: var(--text-muted);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
 /* Status Messages */
 #status-container {
     margin-bottom: 2rem;
@@ -237,24 +255,6 @@ input:focus {
     margin-bottom: 1rem;
 }
 
-.btn-secondary {
-    background: var(--text-muted);
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: var(--border-radius);
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.btn-secondary:hover {
-    background: #5a6268;
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-hover);
-}
-
 .polling-status {
     padding: 0.75rem;
     border-radius: var(--border-radius);
@@ -275,6 +275,41 @@ input:focus {
     border: 1px solid var(--border-color);
     padding: 0.5rem;
     border-radius: var(--border-radius);
+}
+
+/* Notification Controls */
+.notification-controls {
+    background-color: var(--light-bg);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+}
+
+.notification-controls h3 {
+    margin-top: 0;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.notification-controls .form-container {
+    margin-bottom: 1rem;
+}
+
+.notification-controls .config-form {
+    margin-bottom: 0;
+}
+
+.notification-controls .btn-secondary {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: 500;
+    margin-top: 0.5rem;
 }
 
 /* Footer */

@@ -3,43 +3,46 @@
 ## 📝 Taken
 
 ### 1. Basis NotificationHandler Module
-- [ ] Creëer `core/notification_handler.py`
-- [ ] Implementeer `NotificationHandler` klasse met basis structuur
-- [ ] Voeg configuratie voor notificatie-emailadres toe
-- [ ] Implementeer `format_ocr_result()` functie voor tekstformattering
-- [ ] Implementeer `prepare_email()` voor email content generatie
+- [x] Creëer `core/notification_handler.py`
+- [x] Implementeer `NotificationHandler` klasse met basis structuur
+- [x] Voeg configuratie voor notificatie-emailadres toe
+- [x] Implementeer `format_ocr_result()` functie voor tekstformattering
+- [x] Implementeer `prepare_email()` voor email content generatie
+- [x] Voeg apart verzendadres toe (apart van het account-emailadres)
 
 ### 2. Email Template
-- [ ] Creëer `templates/email_response.html` met responsive layout
-- [ ] Implementeer secties voor metagegevens, resultaattekst en footer
-- [ ] Voeg styling toe voor goede leesbaarheid op verschillende devices
+- [x] Creëer `templates/email_response.html` met responsive layout
+- [x] Implementeer secties voor metagegevens, resultaattekst en footer
+- [x] Voeg styling toe voor goede leesbaarheid op verschillende devices
 
 ### 3. SMTP Integratie
-- [ ] Hergebruik SMTP configuratie uit EmailHandler
-- [ ] Implementeer `send_ocr_result()` functie met error handling
-- [ ] Voeg retry mechanisme toe voor stabiele verzending
+- [x] Hergebruik SMTP configuratie uit EmailHandler
+- [x] Implementeer `send_ocr_result()` functie met error handling
+- [x] Voeg retry mechanisme toe voor stabiele verzending
 
 ### 4. App.py Integratie
-- [ ] Update OCR verwerking in EmailHandler om NotificationHandler te gebruiken
-- [ ] Voeg configuratie-opties toe voor notificaties inclusief notificatie-emailadres
-- [ ] Voeg API endpoint toe voor het instellen van het notificatie-emailadres
-- [ ] Zorg voor juiste error handling en logging
+- [x] Update OCR verwerking in EmailHandler om NotificationHandler te gebruiken
+- [x] Voeg configuratie-opties toe voor notificaties inclusief notificatie-emailadres
+- [x] Voeg API endpoint toe voor het instellen van het notificatie-emailadres
+- [x] Zorg voor juiste error handling en logging
+- [x] Voeg API endpoint toe voor het instellen van een apart verzendadres
 
 ## 🧪 Unit Tests
-- [ ] Test voor formattering van OCR resultaten
-- [ ] Test voor email template rendering
-- [ ] Test voor SMTP verzending (met mock)
+- [x] Test voor formattering van OCR resultaten
+- [x] Test voor email template rendering
+- [x] Test voor SMTP verzending (met mock)
 
 ## 📋 Technische Details
 
 ### NotificationHandler API
 ```python
-def __init__(self, smtp_config, notification_email=None):
+def __init__(self, smtp_config, notification_email=None, sender_email=None):
     """Initialize notification handler.
     
     Args:
         smtp_config (dict): SMTP server configuration
         notification_email (str, optional): Default notification email address
+        sender_email (str, optional): Custom sender email (overrides smtp_config email)
     """
     # Implementatie...
 
@@ -48,6 +51,14 @@ def set_notification_email(self, email):
     
     Args:
         email (str): Email address for notifications
+    """
+    # Implementatie...
+
+def set_sender_email(self, email):
+    """Set or update the sender email address.
+    
+    Args:
+        email (str): Email address to send from
     """
     # Implementatie...
 
