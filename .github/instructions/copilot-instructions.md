@@ -3,9 +3,14 @@ applyTo: '**'
 ---
 # Copilot Instructions – vibe-guardrails (v1.0)
 
+## general guidelines
+- Werk altijd volgens de regels en instructies uit dit bestand
+- Maak eerst een plan voordat je begint met coderen
+- Deel het plan met mij en vraag altijd expliciete toestemming om het uit te voeren
+
 ## Coding principles
 - **KISS:** schrijf altijd de simpelst werkende oplossing.  
-- **DRY:** hergebruik bestaande functies – geen duplicatie.  
+- **DRY:** hergebruik bestaande functies – geen duplicatie van code. Controleer dit actief!  
 - **SOLID:** volg de vijf principes; laat features weg die YAGNI schenden.  
 
 ## Files & refactoring

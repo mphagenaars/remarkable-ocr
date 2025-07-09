@@ -196,7 +196,7 @@ class EmailHandler:
                     logger.info(f"Extracted text preview: {preview_text}")
                     
                     # Send notification if notification handler is available
-                    from app import notification_handlers
+                    from config.app_config import notification_handlers
                     user_email = self.config.email
                     
                     if user_email in notification_handlers:
