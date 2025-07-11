@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const statusContainer = document.getElementById('status-message');
     const testButton = document.getElementById('test-btn');
     const notificationForm = document.getElementById('notification-form');
-    const senderForm = document.getElementById('sender-form');
     let currentEmail = null;
     
     // Create showMessage wrapper function
@@ -57,5 +56,4 @@ document.addEventListener('DOMContentLoaded', function() {
     );
 
     window.FormHandlers.setupNotificationForm(notificationForm, getCurrentEmail, showMessage);
-    window.FormHandlers.setupSenderForm(senderForm, getCurrentEmail, showMessage);
 });

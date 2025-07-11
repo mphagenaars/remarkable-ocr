@@ -30,18 +30,15 @@ template_env = jinja2.Environment(loader=template_loader)
 class NotificationHandler:
     """Handles formatting and sending OCR result notifications."""
     
-    def __init__(self, smtp_config: Dict[str, Any], notification_email: Optional[str] = None, 
-                 sender_email: Optional[str] = None):
+    def __init__(self, smtp_config: Dict[str, Any], notification_email: Optional[str] = None):
         """Initialize notification handler.
         
         Args:
             smtp_config (dict): SMTP server configuration
             notification_email (str, optional): Default notification email address
-            sender_email (str, optional): Custom sender email (overrides smtp_config email)
         """
         self.smtp_config = smtp_config
         self.notification_email = notification_email
-        self.sender_email = sender_email or self.smtp_config["email"]
         self.max_retries = 3
         self.retry_delay = 5  # seconds
         
@@ -54,15 +51,7 @@ class NotificationHandler:
         self.notification_email = email
         logger.info(f"Notification email updated to: {email}")
         
-    def set_sender_email(self, email: str):
-        """Set or update the sender email address.
-        
-        Args:
-            email (str): Email address to send from
-        """
-        self.sender_email = email
-        logger.info(f"Sender email updated to: {email}")
-        
+
     async def format_ocr_result(self, ocr_result: Dict[str, Any]) -> Dict[str, Any]:
         """Format OCR result text for better readability.
         
@@ -103,7 +92,7 @@ class NotificationHandler:
         """
         message = MIMEMultipart("alternative")
         message["Subject"] = f"OCR Resultaat: {original_filename}"
-        message["From"] = self.sender_email
+        message["From"] = self.smtp_config["email"]
         message["To"] = recipient
         
         # Create plain text version
@@ -221,7 +210,7 @@ Automatisch verwerkt door Remarkable 2 naar Tekst Converter.
                     server.starttls(context=context)
                     server.login(self.smtp_config["email"], self.smtp_config["password"])
                     server.sendmail(
-                        self.sender_email,
+                        self.smtp_config["email"],
                         recipient,
                         message.as_string()
                     )

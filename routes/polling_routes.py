@@ -55,7 +55,6 @@ async def start_polling(
         
         # Initialize notification handler if notification email is set
         notification_email = config_data.get("notification_email")
-        sender_email = config_data.get("sender_email")
         if notification_email:
             # Create SMTP config for notification handler
             smtp_config = {
@@ -68,15 +67,11 @@ async def start_polling(
             # Create notification handler
             notification_handler = NotificationHandler(
                 smtp_config, 
-                notification_email, 
-                sender_email
+                notification_email
             )
             set_notification_handler(email, notification_handler)
             
-            target_info = f"target: {notification_email}"
-            if sender_email:
-                target_info += f", sender: {sender_email}"
-            print(f"Notification handler initialized for {email} with {target_info}")
+            print(f"Notification handler initialized for {email} with target: {notification_email}")
         
         # Start polling in background
         background_tasks.add_task(handler.start_polling, 30)  # Poll every 30 seconds

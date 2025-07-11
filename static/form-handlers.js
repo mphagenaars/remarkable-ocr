@@ -1,6 +1,6 @@
 /**
  * Form Handlers
- * Handles form submission logic for config, notification, and sender forms
+ * Handles form submission logic for config and notification forms
  */
 
 window.FormHandlers = {
@@ -97,43 +97,6 @@ window.FormHandlers = {
                 }
             } catch (error) {
                 showMessageCallback('error', `❌ Fout bij instellen notificatie-email: ${error.message}`);
-            }
-        });
-    },
-
-    /**
-     * Setup sender email form handler
-     */
-    setupSenderForm: function(senderForm, getCurrentEmailCallback, showMessageCallback) {
-        if (!senderForm) return;
-
-        senderForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const currentEmail = getCurrentEmailCallback();
-            if (!currentEmail) {
-                showMessageCallback('error', '❌ Configureer eerst je email instellingen');
-                return;
-            }
-            
-            const formData = new FormData(senderForm);
-            formData.set('email', currentEmail); // Ensure current email is set
-            
-            try {
-                const response = await fetch('/set-sender-email', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const result = await response.json();
-                
-                if (response.ok && result.status === 'success') {
-                    showMessageCallback('success', result.message);
-                } else {
-                    showMessageCallback('error', result.message);
-                }
-            } catch (error) {
-                showMessageCallback('error', `❌ Fout bij instellen verzendadres: ${error.message}`);
             }
         });
     }

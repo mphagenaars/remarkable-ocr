@@ -23,8 +23,7 @@ async def test_connection(
     smtp_port: int = Form(587),
     allowed_senders: str = Form(...),
     openrouter_api_key: str = Form(""),  # Optional OCR API key
-    notification_email: str = Form(""),  # Optional notification email
-    sender_email: str = Form("")  # Optional separate sender email
+    notification_email: str = Form("")  # Optional notification email
 ):
     """Test IMAP en SMTP connectiviteit volgens MVP spec"""
     try:
@@ -63,8 +62,7 @@ async def test_connection(
             "allowed_senders": sender_list,
             "openrouter_api_key": openrouter_api_key.strip() if openrouter_api_key else None,
             "status": "connected",
-            "notification_email": notification_email.strip() if notification_email else None,
-            "sender_email": sender_email.strip() if sender_email else None
+            "notification_email": notification_email.strip() if notification_email else None
         }
         set_user_config(email, config)
         

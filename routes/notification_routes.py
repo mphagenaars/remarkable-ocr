@@ -1,6 +1,6 @@
 """
 Notification configuration routes
-Handles notification email and sender email settings
+Handles notification email settings
 """
 
 from fastapi import APIRouter, Form
@@ -61,38 +61,4 @@ async def set_notification_email(
         }, status_code=500)
 
 
-@router.post("/set-sender-email")
-async def set_sender_email(
-    email: str = Form(...),
-    sender_email: str = Form(...)
-):
-    """Stel een apart verzendadres in voor gebruiker"""
-    if not is_user_configured(email):
-        return JSONResponse({
-            "status": "error",
-            "message": "❌ Email niet geconfigureerd",
-            "details": "Configureer eerst je email-instellingen"
-        }, status_code=400)
-    
-    try:
-        # Update config
-        config = get_user_config(email)
-        config["sender_email"] = sender_email
-        set_user_config(email, config)
-        
-        # Update notification handler if it exists
-        notification_handler = get_notification_handler(email)
-        if notification_handler:
-            notification_handler.set_sender_email(sender_email)
-        
-        return JSONResponse({
-            "status": "success",
-            "message": f"✅ Verzendadres ingesteld: {sender_email}",
-            "details": "OCR resultaten worden vanuit dit adres verzonden"
-        })
-        
-    except Exception as e:
-        return JSONResponse({
-            "status": "error",
-            "message": f"❌ Fout bij instellen verzendadres: {str(e)}"
-        }, status_code=500)
+

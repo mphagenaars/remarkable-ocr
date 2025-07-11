@@ -53,9 +53,8 @@ window.PollingModule = {
         if (notificationControls) {
             notificationControls.style.display = 'block';
             
-            // Set hidden email fields to current email
+            // Set hidden email field to current email
             document.getElementById('notification_account').value = currentEmail;
-            document.getElementById('sender_account').value = currentEmail;
         }
         
         // Insert after form container
