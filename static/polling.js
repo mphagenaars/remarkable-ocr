@@ -57,9 +57,9 @@ window.PollingModule = {
             document.getElementById('notification_account').value = currentEmail;
         }
         
-        // Insert after form container
-        const formContainer = document.querySelector('.form-container');
-        formContainer.parentNode.insertBefore(controlsDiv, formContainer.nextSibling);
+        // Insert after config container
+        const configContainer = document.querySelector('.config-container');
+        configContainer.parentNode.insertBefore(controlsDiv, configContainer.nextSibling);
         
         // Add event listeners (get fresh references after DOM insertion)
         const newStartBtn = document.getElementById('start-polling-btn');

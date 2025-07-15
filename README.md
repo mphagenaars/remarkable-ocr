@@ -38,6 +38,8 @@ cp .env.example .env
 python app.py
 ```
 
+**⚠️ LXC Container Users:** Bekijk [`docs/installation.md`](docs/installation.md) voor gedetailleerde installatie-instructies en troubleshooting.
+
 Open `http://localhost:8000` in je browser.
 
 ## 📋 MVP Status

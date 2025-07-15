@@ -8,7 +8,7 @@ import logging
 from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
 from dotenv import load_dotenv
 
 # Import route modules
@@ -44,6 +44,12 @@ app.include_router(admin_router)
 async def index(request: Request):
     """Hoofdpagina met email configuratie formulier"""
     return templates.TemplateResponse("index.html", {"request": request})
+
+
+@app.get("/favicon.ico")
+async def favicon():
+    """Serve favicon from static directory"""
+    return FileResponse("static/favicon.ico")
 
 
 if __name__ == "__main__":

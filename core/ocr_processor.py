@@ -123,7 +123,8 @@ class OCRProcessor:
                 }
             ],
             "max_tokens": 4000,
-            "temperature": 0.0
+            "temperature": 0.0,
+            "data_collection": "deny"
         }
         
         response = await self.client.post(
