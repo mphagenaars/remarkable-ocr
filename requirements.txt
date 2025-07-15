@@ -9,11 +9,11 @@ python-multipart>=0.0.6,<0.1.0
 
 # Security & Cryptography
 # Note: cryptography vereist system packages (zie docs/installation.md)
-bcrypt>=4.1.2,<4.2.0
-cryptography>=41.0.8,<42.0.0
+bcrypt>=4.0.0
+cryptography>=3.0.0
 
 # HTTP Client voor OpenRouter API
-httpx>=0.25.2,<0.26.0
+httpx>=0.24.0
 
 # Configuration Management
 python-dotenv>=1.0.0,<1.1.0

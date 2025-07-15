@@ -29,6 +29,15 @@ Deze tool monitort een e-mailbox op PDF/PNG bijlagen van Remarkable 2 notities, 
 - OpenRouter API key
 
 ### Installatie
+
+**Quick Install (LXC containers):**
+```bash
+git clone https://github.com/mphagenaars/remarkable-ocr.git
+cd remarkable-ocr
+bash install.sh  # Automatische installatie
+```
+
+**Handmatige installatie:**
 ```bash
 git clone https://github.com/mphagenaars/remarkable-ocr.git
 cd remarkable-ocr
@@ -38,7 +47,7 @@ cp .env.example .env
 python app.py
 ```
 
-**⚠️ LXC Container Users:** Bekijk [`docs/installation.md`](docs/installation.md) voor gedetailleerde installatie-instructies en troubleshooting.
+**⚠️ LXC Container Users:** Bij dependency problemen, gebruik `bash install.sh` of bekijk [`docs/installation.md`](docs/installation.md) voor gedetailleerde troubleshooting.
 
 Open `http://localhost:8000` in je browser.
 

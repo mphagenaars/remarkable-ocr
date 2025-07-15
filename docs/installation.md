@@ -36,12 +36,71 @@ pip install --upgrade pip setuptools wheel
 ```
 
 ### Stap 3: Dependencies Installeren
+
+**Optie A: Normale installatie**
 ```bash
 # Installeer dependencies uit requirements.txt
 pip install -r requirements.txt
 ```
 
-## Troubleshooting
+**Optie B: Minimale installatie (bij dependency problemen)**
+```bash
+# Installeer alleen essentiële dependencies
+pip install -r requirements-minimal.txt
+```
+
+**Optie C: Handmatige installatie (laatste redmiddel)**
+```bash
+# Installeer packages één voor één
+pip install fastapi==0.104.1
+pip install uvicorn==0.24.0
+pip install httpx==0.24.1
+pip install jinja2==3.1.2
+pip install python-multipart==0.0.6
+pip install python-dotenv==1.0.0
+
+# Optioneel (alleen als security features nodig zijn):
+# pip install --only-binary=cryptography cryptography
+```
+
+## Quick Fix voor LXC Container Problemen
+
+**Als je steeds dependency errors krijgt, probeer deze volgorde:**
+
+```bash
+# 1. Maak schone environment
+cd /home/matthijs/remarkable
+rm -rf venv
+python3 -m venv venv
+source venv/bin/activate
+
+# 2. Upgrade tools eerst
+pip install --upgrade pip setuptools wheel
+
+# 3. Installeer minimaal (ZONDER cryptography)
+pip install fastapi==0.104.1
+pip install uvicorn==0.24.0
+pip install jinja2==3.1.2
+pip install python-multipart==0.0.6
+pip install httpx==0.24.1
+pip install python-dotenv==1.0.0
+
+# 4. Test of het werkt
+python3 -c "import fastapi; print('FastAPI OK')"
+python3 app.py
+```
+
+**Als je nog steeds `ModuleNotFoundError` krijgt:**
+```bash
+# Controleer virtual environment
+echo $VIRTUAL_ENV  # Should show /home/matthijs/remarkable/venv
+
+# Controleer pip locatie
+which pip  # Should show venv/bin/pip
+
+# Controleer installed packages
+pip list | grep -E "(fastapi|uvicorn|httpx)"
+```
 
 ### Cryptography Build Errors
 Als je errors krijgt bij het installeren van `cryptography`:
@@ -74,6 +133,59 @@ pip install fastapi==0.104.1
 pip install uvicorn==0.24.0
 pip install httpx==0.25.2
 # etc...
+```
+
+### FastAPI Import Errors
+Als je `ModuleNotFoundError: No module named 'fastapi'` krijgt:
+
+```bash
+# Controleer of virtual environment actief is
+source venv/bin/activate
+
+# Controleer geïnstalleerde packages
+pip list | grep fastapi
+
+# Herinstalleer FastAPI expliciet
+pip install --force-reinstall fastapi==0.104.1
+
+# Test import
+python3 -c "import fastapi; print('FastAPI OK')"
+```
+
+### Virtual Environment Issues (MEEST VOORKOMEND)
+```bash
+# Symptoom: ModuleNotFoundError ondanks installatie
+# Oorzaak: Verkeerde Python interpreter of venv niet actief
+
+# Fix 1: Controleer venv status
+source venv/bin/activate
+echo "Virtual env: $VIRTUAL_ENV"
+
+# Fix 2: Als venv corrupt is - hermaak
+deactivate
+rm -rf venv
+python3 -m venv venv
+source venv/bin/activate
+
+# Fix 3: Installeer packages direct in venv
+./venv/bin/pip install fastapi==0.104.1
+./venv/bin/python app.py
+```
+
+### System vs Virtual Environment Conflict
+```bash
+# Probleem: Packages geïnstalleerd in system Python ipv venv
+# Oplossing: Forceer venv gebruik
+
+# Check waar packages zijn geïnstalleerd
+pip show fastapi | grep Location
+
+# Moet zijn: /home/matthijs/remarkable/venv/lib/python3.x/site-packages
+# Als het /usr/lib/python3 toont, dan is venv niet actief!
+
+# Fix:
+source venv/bin/activate
+pip install --force-reinstall fastapi==0.104.1
 ```
 
 ## Configuratie
@@ -126,3 +238,34 @@ pip install pytest pytest-asyncio
 # Run tests
 python -m pytest test_*.py
 ```
+
+## Diagnose Checklist
+
+**Stap 1: Python Environment Check**
+```bash
+which python3        # Expected: /usr/bin/python3
+python3 --version    # Expected: Python 3.8+
+which pip           # Expected: /home/matthijs/remarkable/venv/bin/pip
+echo $VIRTUAL_ENV   # Expected: /home/matthijs/remarkable/venv
+```
+
+**Stap 2: Package Installation Check**
+```bash
+pip list | grep fastapi     # Should show fastapi version
+pip show fastapi           # Should show installation details
+python3 -c "import sys; print(sys.path)"  # Check Python path
+```
+
+**Stap 3: Common LXC Container Issues**
+```bash
+# Check available disk space
+df -h
+
+# Check available memory
+free -h
+
+# Check if system packages are installed
+dpkg -l | grep -E "(python3-dev|build-essential|libssl-dev)"
+```
+
+## Troubleshooting
