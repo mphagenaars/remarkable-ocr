@@ -28,8 +28,8 @@ sudo apt install build-essential libssl-dev libffi-dev python3-dev -y
 cd /path/to/remarkable
 
 # Maak virtual environment (sterk aanbevolen)
-python3 -m venv venv
-source venv/bin/activate
+python3 -m venv .venv
+source .venv/bin/activate
 
 # Upgrade pip en tools
 pip install --upgrade pip setuptools wheel
@@ -70,9 +70,9 @@ pip install python-dotenv==1.0.0
 ```bash
 # 1. Maak schone environment
 cd /home/matthijs/remarkable
-rm -rf venv
-python3 -m venv venv
-source venv/bin/activate
+rm -rf .venv
+python3 -m venv .venv
+source .venv/bin/activate
 
 # 2. Upgrade tools eerst
 pip install --upgrade pip setuptools wheel
@@ -93,10 +93,10 @@ python3 app.py
 **Als je nog steeds `ModuleNotFoundError` krijgt:**
 ```bash
 # Controleer virtual environment
-echo $VIRTUAL_ENV  # Should show /home/matthijs/remarkable/venv
+echo $VIRTUAL_ENV  # Should show /home/matthijs/remarkable/.venv
 
 # Controleer pip locatie
-which pip  # Should show venv/bin/pip
+which pip  # Should show .venv/bin/pip
 
 # Controleer installed packages
 pip list | grep -E "(fastapi|uvicorn|httpx)"
@@ -140,7 +140,7 @@ Als je `ModuleNotFoundError: No module named 'fastapi'` krijgt:
 
 ```bash
 # Controleer of virtual environment actief is
-source venv/bin/activate
+source .venv/bin/activate
 
 # Controleer geïnstalleerde packages
 pip list | grep fastapi
@@ -155,21 +155,21 @@ python3 -c "import fastapi; print('FastAPI OK')"
 ### Virtual Environment Issues (MEEST VOORKOMEND)
 ```bash
 # Symptoom: ModuleNotFoundError ondanks installatie
-# Oorzaak: Verkeerde Python interpreter of venv niet actief
+# Oorzaak: Verkeerde Python interpreter of .venv niet actief
 
-# Fix 1: Controleer venv status
-source venv/bin/activate
+# Fix 1: Controleer .venv status
+source .venv/bin/activate
 echo "Virtual env: $VIRTUAL_ENV"
 
-# Fix 2: Als venv corrupt is - hermaak
+# Fix 2: Als .venv corrupt is - hermaak
 deactivate
-rm -rf venv
-python3 -m venv venv
-source venv/bin/activate
+rm -rf .venv
+python3 -m venv .venv
+source .venv/bin/activate
 
-# Fix 3: Installeer packages direct in venv
-./venv/bin/pip install fastapi==0.104.1
-./venv/bin/python app.py
+# Fix 3: Installeer packages direct in .venv
+./.venv/bin/pip install fastapi==0.104.1
+./.venv/bin/python app.py
 ```
 
 ### System vs Virtual Environment Conflict
@@ -180,11 +180,11 @@ source venv/bin/activate
 # Check waar packages zijn geïnstalleerd
 pip show fastapi | grep Location
 
-# Moet zijn: /home/matthijs/remarkable/venv/lib/python3.x/site-packages
-# Als het /usr/lib/python3 toont, dan is venv niet actief!
+# Moet zijn: /home/matthijs/remarkable/.venv/lib/python3.x/site-packages
+# Als het /usr/lib/python3 toont, dan is .venv niet actief!
 
 # Fix:
-source venv/bin/activate
+source .venv/bin/activate
 pip install --force-reinstall fastapi==0.104.1
 ```
 
@@ -245,8 +245,8 @@ python -m pytest test_*.py
 ```bash
 which python3        # Expected: /usr/bin/python3
 python3 --version    # Expected: Python 3.8+
-which pip           # Expected: /home/matthijs/remarkable/venv/bin/pip
-echo $VIRTUAL_ENV   # Expected: /home/matthijs/remarkable/venv
+which pip           # Expected: /home/matthijs/remarkable/.venv/bin/pip
+echo $VIRTUAL_ENV   # Expected: /home/matthijs/remarkable/.venv
 ```
 
 **Stap 2: Package Installation Check**

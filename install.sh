@@ -18,9 +18,9 @@ sudo apt update
 sudo apt install -y python3 python3-pip python3-venv build-essential
 
 echo "🐍 Stap 2: Python virtual environment maken..."
-rm -rf venv
-python3 -m venv venv
-source venv/bin/activate
+rm -rf .venv
+python3 -m venv .venv
+source .venv/bin/activate
 
 echo "⬆️ Stap 3: Pip upgraden..."
 pip install --upgrade pip setuptools wheel
@@ -42,7 +42,7 @@ echo ""
 echo "🎉 Installatie succesvol!"
 echo ""
 echo "Volgende stappen:"
-echo "1. source venv/bin/activate"
+echo "1. source .venv/bin/activate"
 echo "2. python3 app.py"
 echo "3. Open http://localhost:8000"
 echo ""
