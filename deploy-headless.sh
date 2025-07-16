@@ -38,8 +38,31 @@ check_venv() {
     echo "✅ Virtual environment gevonden"
 }
 
+# Functie: Cleanup poort 8000 conflicten
+cleanup_port() {
+    echo "🔍 Checking poort 8000..."
+    
+    # Find processen op poort 8000
+    local pids=$(lsof -ti:8000 2>/dev/null || netstat -tlnp 2>/dev/null | grep ':8000 ' | awk '{print $7}' | cut -d'/' -f1 | grep -v -)
+    
+    if [[ -n "$pids" ]]; then
+        echo "🛑 Stopping processen op poort 8000: $pids"
+        echo "$pids" | xargs -r kill -TERM 2>/dev/null || true
+        sleep 2
+        
+        # Force kill als nodig
+        local remaining=$(lsof -ti:8000 2>/dev/null || true)
+        if [[ -n "$remaining" ]]; then
+            echo "💥 Force killing resterende processen: $remaining"
+            echo "$remaining" | xargs -r kill -KILL 2>/dev/null || true
+        fi
+    fi
+    echo "✅ Poort 8000 vrijgemaakt"
+}
+
 # Functie: Stop bestaande sessie
 stop_service() {
+    cleanup_port
     if screen -list | grep -q "$SESSION_NAME"; then
         echo "🛑 Stopping bestaande remarkable-ocr sessie..."
         screen -S "$SESSION_NAME" -X quit 2>/dev/null || true
