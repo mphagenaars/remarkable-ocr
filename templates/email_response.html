@@ -67,9 +67,9 @@
             padding: 15px;
             border: 1px solid #dee2e6;
             border-radius: 8px;
-            white-space: pre-wrap;
             font-family: monospace;
             margin-bottom: 20px;
+            line-height: 1.4;
         }
         
         /* Footer */
@@ -121,22 +121,14 @@
                         <td>{{ filename }}</td>
                     </tr>
                     <tr>
-                        <td>Vertrouwen</td>
-                        <td>{{ result.confidence }}</td>
-                    </tr>
-                    <tr>
                         <td>Model</td>
                         <td>{{ result.model }}</td>
-                    </tr>
-                    <tr>
-                        <td>Verwerkingstijd</td>
-                        <td>{{ result.processing_time }}</td>
                     </tr>
                 </table>
             </div>
             
             <h2>Geëxtraheerde tekst</h2>
-            <div class="text-content">{{ result.text|safe }}</div>
+            <div class="text-content">{{ result.html_text|safe }}</div>
         </div>
         
         <div class="footer">

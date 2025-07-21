@@ -63,21 +63,44 @@ class NotificationHandler:
         """
         formatted_text = ocr_result.get("text", "")
         
-        # Preserve paragraphs and whitespace
-        # For now, we keep it simple and preserve the original text structure
-        # In future iterations, we could add smart paragraph detection and cleanup
+        # Convert newlines to HTML breaks for email compatibility
+        # This ensures proper line breaks in email clients that don't support CSS white-space
+        html_formatted_text = self._convert_newlines_to_html(formatted_text)
         
         # Add metadata to the formatted result
         formatted_result = {
-            "text": formatted_text,
-            "confidence": ocr_result.get("confidence", "Unknown"),
-            "processing_time": ocr_result.get("processing_time", "Unknown"),
+            "text": formatted_text,  # Keep original for plain text email
+            "html_text": html_formatted_text,  # HTML version for template
             "timestamp": ocr_result.get("timestamp", "Unknown"),
             "model": ocr_result.get("model", "Unknown"),
             "success": ocr_result.get("success", False)
         }
         
         return formatted_result
+        
+    def _convert_newlines_to_html(self, text: str) -> str:
+        """Convert newlines to HTML <br> tags for email compatibility.
+        
+        Args:
+            text (str): Text with newlines
+            
+        Returns:
+            str: Text with HTML line breaks
+        """
+        if not text:
+            return text
+            
+        # Escape any existing HTML to prevent XSS
+        import html
+        escaped_text = html.escape(text)
+        
+        # Convert double newlines to paragraph breaks
+        html_text = escaped_text.replace('\n\n', '<br><br>')
+        
+        # Convert single newlines to line breaks
+        html_text = html_text.replace('\n', '<br>')
+        
+        return html_text
         
     async def prepare_email(self, recipient: str, formatted_result: Dict[str, Any], original_filename: str) -> MIMEMultipart:
         """Prepare email content with OCR results.
@@ -98,7 +121,6 @@ class NotificationHandler:
         # Create plain text version
         text_content = f"""OCR Resultaat voor: {original_filename}
         
-Vertrouwen: {formatted_result.get('confidence', 'Unknown')}
 Model: {formatted_result.get('model', 'Unknown')}
 
 -------- TEKST --------
@@ -124,7 +146,6 @@ Automatisch verwerkt door Remarkable 2 naar Tekst Converter.
             <html>
               <body>
                 <h2>OCR Resultaat: {original_filename}</h2>
-                <p><strong>Vertrouwen:</strong> {formatted_result.get('confidence', 'Unknown')}</p>
                 <p><strong>Model:</strong> {formatted_result.get('model', 'Unknown')}</p>
                 <hr>
                 <pre style="white-space: pre-wrap; font-family: monospace;">{formatted_result.get('text', 'Geen tekst gevonden.')}</pre>
