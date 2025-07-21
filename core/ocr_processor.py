@@ -57,7 +57,8 @@ class OCRProcessor:
             prompt = (
                 "Zet deze handgeschreven Nederlandse tekst om met OCR. "
                 "Behoud paragrafen, regeleinden en opmaak. "
-                "Geef alleen de geëxtraheerde tekst terug zonder commentaar."
+                "Extraheer tekst en corrigeer spelfouten waar nodig. "
+                "Stuur de output terug zonder commentaar. "
             )
             
             # Encode to base64
