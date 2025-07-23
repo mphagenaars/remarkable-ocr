@@ -1,23 +1,12 @@
-# Remarkable OCR - Python Dependencies
-# Voor installatie in LXC containers: zie docs/installation.md
+# Minimal requirements voor LXC containers met dependency issues
+# Gebruik: pip install -r requirements-minimal.txt
 
-# Core Web Framework
-fastapi>=0.104.1,<0.105.0
-uvicorn[standard]>=0.24.0,<0.25.0
-jinja2>=3.1.2,<3.2.0
-python-multipart>=0.0.6,<0.1.0
+fastapi==0.104.1
+uvicorn==0.24.0
+jinja2==3.1.2
+python-multipart==0.0.6
+httpx==0.24.1
+python-dotenv==1.0.0
 
-# Security & Cryptography
-# Note: cryptography vereist system packages (zie docs/installation.md)
-bcrypt>=4.0.0
-cryptography>=3.0.0
-
-# HTTP Client voor OpenRouter API
-httpx>=0.24.0
-
-# Configuration Management
-python-dotenv>=1.0.0,<1.1.0
-
-# Development Dependencies (optioneel)
-# pytest>=7.4.0,<7.5.0
-# pytest-asyncio>=0.21.0,<0.22.0
+# Skip cryptography/bcrypt als er problemen zijn
+# Deze zijn alleen nodig voor security features

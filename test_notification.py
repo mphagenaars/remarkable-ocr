@@ -72,10 +72,34 @@ class TestNotificationHandler(unittest.TestCase):
         
         formatted_result = asyncio.run(self.handler.format_ocr_result(ocr_result))
         
-        # Check that newlines are preserved exactly
+        # Check that newlines are preserved exactly in original text
         self.assertEqual(formatted_result["text"], ocr_result["text"])
         self.assertIn("\n", formatted_result["text"])
         self.assertIn("\n\n", formatted_result["text"])  # Double newlines for paragraphs
+        
+        # Check that HTML version has proper <br> tags
+        self.assertIn("html_text", formatted_result)
+        html_text = formatted_result["html_text"]
+        self.assertIn("<br>", html_text)
+        self.assertIn("<br><br>", html_text)  # Double breaks for paragraphs
+        
+        # Ensure original text structure is converted correctly
+        self.assertIn("Eerste regel<br>Tweede regel<br><br>Nieuwe paragraaf", html_text)
+        
+    def test_convert_newlines_to_html(self):
+        """Test HTML newline conversion function"""
+        # Test the private method directly
+        test_text = "Line 1\nLine 2\n\nParagraph 2\nLine 3"
+        expected_html = "Line 1<br>Line 2<br><br>Paragraph 2<br>Line 3"
+        
+        result = self.handler._convert_newlines_to_html(test_text)
+        self.assertEqual(result, expected_html)
+        
+        # Test HTML escaping
+        test_text_with_html = "Text with <script>alert('xss')</script>\nNew line"
+        result = self.handler._convert_newlines_to_html(test_text_with_html)
+        self.assertIn("&lt;script&gt;", result)  # HTML should be escaped
+        self.assertIn("<br>", result)  # But newlines should become <br>
         
     @patch('smtplib.SMTP')
     def test_send_with_retry(self, mock_smtp):
@@ -165,36 +189,6 @@ class TestNotificationHandler(unittest.TestCase):
         self.assertEqual(len(message.get_payload()), 2)
         self.assertEqual(message.get_payload(0).get_content_type(), "text/plain")
         self.assertEqual(message.get_payload(1).get_content_type(), "text/html")
-        
-    @patch('jinja2.Environment.get_template')
-    def test_prepare_email_preserves_newlines_in_html(self, mock_get_template):
-        """Test that HTML email template preserves newlines with |safe filter"""
-        # Mock template that includes newlines in rendered output
-        mock_template = MagicMock()
-        text_with_newlines = "Regel 1\nRegel 2\n\nParagraaf 2"
-        mock_template.render.return_value = f"<div class='text-content'>{text_with_newlines}</div>"
-        mock_get_template.return_value = mock_template
-        
-        # Sample data with newlines
-        recipient = "test@example.com"
-        formatted_result = {
-            "text": text_with_newlines,
-            "confidence": 0.95,
-            "model": "test-model"
-        }
-        filename = "test.pdf"
-        
-        # Prepare email
-        message = asyncio.run(self.handler.prepare_email(recipient, formatted_result, filename))
-        
-        # Check that template was called with correct data including newlines
-        call_args = mock_template.render.call_args[1]
-        self.assertEqual(call_args['result']['text'], text_with_newlines)
-        
-        # Check HTML part contains the newlines
-        html_part = message.get_payload(1)
-        html_content = html_part.get_payload()
-        self.assertIn(text_with_newlines, html_content)
 
 
 if __name__ == "__main__":

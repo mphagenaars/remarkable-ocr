@@ -61,6 +61,17 @@ processed/
 .pytest_cache/
 .coverage
 htmlcov/
+test_*.py
+
+# Development & Planning
+plan.md
+progress.md
+requirements-*.txt.backup
+
+# Documentation
+docs/
+.github/
+.rules
 
 # Documentation builds
 docs/_build/

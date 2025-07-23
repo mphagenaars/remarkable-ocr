@@ -25,13 +25,8 @@ source .venv/bin/activate
 echo "⬆️ Stap 3: Pip upgraden..."
 pip install --upgrade pip setuptools wheel
 
-echo "📚 Stap 4: Python packages installeren (minimaal)..."
-pip install fastapi==0.104.1
-pip install uvicorn==0.24.0
-pip install jinja2==3.1.2
-pip install python-multipart==0.0.6
-pip install httpx==0.24.1
-pip install python-dotenv==1.0.0
+echo "📚 Stap 4: Python packages installeren..."
+pip install -r requirements.txt
 
 echo "✅ Stap 5: Installatie testen..."
 python3 -c "import fastapi; print('FastAPI: OK')"

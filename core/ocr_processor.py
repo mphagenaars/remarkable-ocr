@@ -55,10 +55,14 @@ class OCRProcessor:
             
             # Nederlandse prompt - simpel en effectief
             prompt = (
-                "Zet deze handgeschreven Nederlandse tekst om met OCR. "
-                "Behoud paragrafen, regeleinden en opmaak. "
-                "Extraheer tekst en corrigeer spelfouten waar nodig. "
-                "Stuur de output terug zonder commentaar. "
+                "Je krijgt van mij een PDF met daarop mijn aantekeningen. "
+                "Deze aantekeningen kunnen bestaan uit handgeschreven tekst en plaatjes. "
+                "Als je handgeschreven Nederlandse tekst aantreft dan zet je deze om met OCR. "
+                "Maak logische zinnen. Zorg dat zinnen die bij elkaar horen op 1 regel komen. "
+                "Corrigeer spelfouten waar nodig. "
+                "Als je een tekening aantreft dan stuur je deze als plaatje mee. "
+                "Behoud paragrafen, opmaak, bullets en pijltjes. "
+                "Stuur de output terug zonder enig commentaar. "
             )
             
             # Encode to base64
