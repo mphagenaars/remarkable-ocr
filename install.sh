@@ -8,8 +8,10 @@ echo "🚀 Remarkable OCR - LXC Container Installer"
 echo "============================================"
 
 # Check if running in correct directory
-if [ ! -f "app.py" ]; then
-    echo "❌ Error: Niet in de juiste directory. Ga naar /home/matthijs/remarkable"
+if [ ! -f "app.py" ] || [ ! -f "requirements.txt" ]; then
+    echo "❌ Error: Niet in de juiste directory. Ga naar de remarkable-ocr project root directory."
+    echo "   Huidige directory: $PWD"
+    echo "   Zorg dat je in de directory bent met app.py en requirements.txt"
     exit 1
 fi
 
@@ -41,4 +43,3 @@ echo "1. source .venv/bin/activate"
 echo "2. python3 app.py"
 echo "3. Open http://localhost:8000"
 echo ""
-echo "Bij problemen: zie docs/installation.md"

@@ -74,7 +74,7 @@ async def start_polling(
             print(f"Notification handler initialized for {email} with target: {notification_email}")
         
         # Start polling in background
-        background_tasks.add_task(handler.start_polling, 30)  # Poll every 30 seconds
+        background_tasks.add_task(handler.start_polling, 300)  # Poll every 5 minutes
         
         # Update status
         config_data["status"] = "polling"
@@ -83,7 +83,7 @@ async def start_polling(
         return JSONResponse({
             "status": "success",
             "message": f"📧 Mailbox polling gestart voor {email}",
-            "details": f"Monitoring inbox elke 30 seconden. Toegestane afzenders: {', '.join(config_data['allowed_senders'])}"
+            "details": f"Monitoring inbox elke 5 minuten. Toegestane afzenders: {', '.join(config_data['allowed_senders'])}"
         })
         
     except Exception as e:

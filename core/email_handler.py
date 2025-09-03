@@ -85,7 +85,7 @@ class EmailHandler:
         else:
             logger.warning(f"No OpenRouter API key provided for {config.email}, OCR disabled")
         
-    async def start_polling(self, interval_seconds: int = 30):
+    async def start_polling(self, interval_seconds: int = 300):
         """Start background polling van mailbox"""
         if self.is_polling:
             logger.warning(f"Polling already active for {self.config.email}")
