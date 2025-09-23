@@ -1,101 +1,96 @@
 # 📝 Remarkable 2 naar Tekst Converter
 
-Automatische conversie van handgeschreven Remarkable 2 notities naar doorzoekbare tekst via e-mail workflow.
+Automatische conversie van handgeschreven Remarkable 2 notities naar doorzoekbare tekst via een e-mail workflow.
 
 ## 🎯 Project Doel
 
-Deze tool monitort een e-mailbox op PDF/PNG bijlagen van Remarkable 2 notities, voert OCR uit via OpenRouter API, en stuurt de geëxtraheerde tekst terug voor archivering en doorzoekbaarheid.
+Deze tool monitort een e-mailbox op PDF/PNG bijlagen van Remarkable 2 notities, voert OCR uit via een AI-model (zoals die beschikbaar zijn via OpenRouter), en stuurt de geëxtraheerde tekst terug voor archivering en doorzoekbaarheid.
 
 ## ✨ Features
 
-### ✅ Werkend (v0.1.0)
-- **Email monitoring:** Automatische IMAP polling voor nieuwe berichten
-- **Sender whitelist:** Alleen emails van toegestane afzenders
-- **Attachment filtering:** PDF/PNG detectie en extractie
-- **UI configuratie:** Web interface voor email setup
-- **Real-time status:** Live polling controls en feedback
-
-### 🚧 In ontwikkeling  
-- **OCR processing:** Nederlandse tekst extractie via Google Gemini 2.5 Flash
-- **Response workflow:** Geautomatiseerde terugkoppeling met geëxtraheerde tekst
-- **Multi-user support:** Admin interface voor gebruikersbeheer
-- **Privacy-first:** Lokale verwerking, veilige credential opslag
+-   **Flexibele Configuratie:**
+    -   **GUI-modus:** Eenvoudige webinterface voor snelle setup.
+    -   **Headless/ENV-modus:** Volledig te configureren via `.env` bestand voor gebruik in servers en containers.
+    -   **Hybride-modus:** Vooraf ingevulde GUI met waarden uit `.env`, maar nog steeds aanpasbaar.
+-   **Email Monitoring:** Automatische IMAP polling voor nieuwe berichten.
+-   **Sender Whitelist:** Verwerkt alleen e-mails van toegestane afzenders.
+-   **Attachment Filtering:** Detecteert en extraheert automatisch PDF- en PNG-bestanden.
+-   **Real-time Status:** Live polling controls en feedback in de webinterface.
+-   **OCR Integratie (Optioneel):** Extraheert tekst uit afbeeldingen via OpenRouter API.
 
 ## 🚀 Quick Start
 
 ### Vereisten
-- Python 3.12+
-- E-mail account met IMAP/SMTP toegang
-- OpenRouter API key
+-   Python 3.10+
+-   Een e-mailaccount met IMAP/SMTP toegang (een app-specifiek wachtwoord wordt aanbevolen).
+-   (Optioneel) Een OpenRouter API key voor OCR.
 
-### Installatie
+### Installatie & Configuratie
 
-**Quick Install (LXC containers):**
-```bash
-git clone https://github.com/mphagenaars/remarkable-ocr.git
-cd remarkable-ocr
-bash install.sh  # Automatische installatie
-```
+1.  **Clone de repository:**
+    ```bash
+    git clone https://github.com/mphagenaars/remarkable-ocr.git
+    cd remarkable-ocr
+    ```
 
-**Handmatige installatie:**
-```bash
-git clone https://github.com/mphagenaars/remarkable-ocr.git
-cd remarkable-ocr
-pip install -r requirements.txt
-cp .env.example .env
-# Bewerk .env met je configuratie
-python app.py
-```
+2.  **Installeer de dependencies:**
+    *   **Aanbevolen (met virtual environment):**
+        ```bash
+        python3 -m venv .venv
+        source .venv/bin/activate
+        pip install -r requirements.txt
+        ```
+    *   **Voor LXC containers is er een `install.sh` script.**
 
-**⚠️ LXC Container Users:** Bij dependency problemen, gebruik `bash install.sh` of bekijk [`docs/installation.md`](docs/installation.md) voor gedetailleerde troubleshooting.
+3.  **Configureer de applicatie:**
+    ```bash
+    # Maak een .env bestand aan vanuit het voorbeeld
+    cp .env.example .env
+    ```
+    Open het `.env` bestand en vul de vereiste variabelen in, zoals `EMAIL`, `EMAIL_PASSWORD`, en `ALLOWED_SENDERS`.
 
-Open `http://localhost:8000` in je browser.
+4.  **Start de applicatie:**
+    ```bash
+    python3 app.py
+    ```
 
-## 📋 MVP Status
+5.  Open je browser en ga naar `http://localhost:8000`.
 
-- [x] **Stap 0:** UI-stub & connectiviteit test
-- [x] **Stap 1:** Mailbox polling
-- [ ] **Stap 2:** OCR integratie
-- [ ] **Stap 3:** Response workflow
-- [ ] **Stap 4:** Database & persistence
-- [ ] **Stap 5:** Multi-user & admin UI
+## ⚙️ Configuratie Modi
+
+Je kunt de applicatie in verschillende modi draaien door de `CONFIG_MODE` variabele in je `.env` bestand aan te passen:
+
+-   `CONFIG_MODE=gui` (standaard): De applicatie wordt volledig via de webinterface geconfigureerd. Waarden uit `.env` worden gebruikt om de velden vooraf in te vullen.
+-   `CONFIG_MODE=env`: De applicatie gebruikt uitsluitend de configuratie uit het `.env` bestand. De webinterface wordt 'read-only' en toont de actieve instellingen. Dit is ideaal voor servers en headless deployments.
+-   `CONFIG_MODE=hybrid`: Combineert beide. De GUI is vooraf ingevuld met `.env` waarden, maar je kunt ze via de interface overschrijven.
+
+Voor headless gebruik (`CONFIG_MODE=env`), kun je de e-mail polling automatisch laten starten door `AUTO_START_POLLING=true` in te stellen in je `.env` bestand.
 
 ## 🏗️ Tech Stack
 
-- **Backend:** Python 3.12, FastAPI, SQLite
-- **Frontend:** HTML, vanilla JavaScript
-- **OCR:** OpenRouter API (Google Gemini 2.5 Flash)
-- **Email:** IMAP/SMTP (stdlib)
+-   **Backend:** Python 3.12, FastAPI
+-   **Frontend:** HTML, vanilla JavaScript
+-   **OCR:** OpenRouter API (bijv. Google Gemini, Claude)
+-   **Email:** IMAP/SMTP (Python stdlib)
 
 ## 📁 Project Structuur
 
 ```
 remarkable/
-├── app.py                # FastAPI main application
-├── core/                 # Core business logic
-├── api/                  # API endpoints
-├── templates/           # Jinja2 HTML templates
-├── static/             # CSS/JS assets
-├── tests/              # Unit tests
-└── docs/               # Feature documentation
+├── app.py                # FastAPI hoofapplicatie
+├── core/                 # Core business logica (email, ocr, notificaties)
+├── routes/               # API endpoints voor de web-interface
+├── config/               # Applicatieconfiguratie en state management
+├── templates/            # Jinja2 HTML templates
+├── static/               # CSS/JS assets
+├── .env.example          # Voorbeeld voor configuratie
+└── requirements.txt      # Python dependencies
 ```
 
 ## 🔐 Security
 
-- Email credentials: AES-256 encryptie
-- User passwords: bcrypt hashing
-- Temp files: Automatische cleanup
-- Rate limiting: Bescherming tegen misbruik
-
-## 📖 Documentatie
-
-- [Implementation Plan](plan.md) - Volledige ontwikkelstrategie
-- [Project Rules](.rules) - Development guardrails
-- [API Documentation](docs/api.md) - API reference (TBD)
-
-## 🤝 Contributing
-
-Dit is een persoonlijk project, maar suggesties zijn welkom via issues.
+-   Gebruik altijd app-specifieke wachtwoorden voor je e-mailaccount.
+-   Sla gevoelige informatie zoals API keys en wachtwoorden nooit op in je code; gebruik het `.env` bestand.
 
 ## 📄 License
 
@@ -103,4 +98,4 @@ MIT License - zie [LICENSE](LICENSE) file.
 
 ---
 
-**Status:** 🚧 In ontwikkeling - MVP fase
+**Status:** ✅ Basisfunctionaliteit geïmplementeerd, inclusief headless configuratie.

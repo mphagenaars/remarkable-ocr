@@ -16,6 +16,10 @@ from routes.connection_routes import router as connection_router
 from routes.polling_routes import router as polling_router
 from routes.notification_routes import router as notification_router
 from routes.admin_routes import router as admin_router
+from config.app_config import (
+    auto_configure_env_user, auto_start_polling, 
+    get_config_mode, is_env_mode, validate_env_config
+)
 
 # Load environment variables
 load_dotenv()
@@ -40,10 +44,45 @@ app.include_router(notification_router)
 app.include_router(admin_router)
 
 
+@app.on_event("startup")
+async def startup_event():
+    """Configure application on startup"""
+    is_valid, message = validate_env_config()
+    if not is_valid:
+        logger.error("="*50)
+        logger.error("FATAL: Invalid environment configuration.")
+        logger.error(message)
+        logger.error("Application will not start with invalid ENV config.")
+        logger.error("="*50)
+        # In a real scenario, you might want to exit here.
+        # For development, we'll log and continue.
+        # import sys
+        # sys.exit(1)
+        return
+
+    auto_configure_env_user()
+    await auto_start_polling()
+    logger.info("Application startup complete")
+
+
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
     """Hoofdpagina met email configuratie formulier"""
-    return templates.TemplateResponse("index.html", {"request": request})
+    env_defaults = {
+        "email": os.getenv("EMAIL", ""),
+        "imap_server": os.getenv("IMAP_SERVER", "imap.gmail.com"),
+        "imap_port": os.getenv("IMAP_PORT", "993"),
+        "smtp_server": os.getenv("SMTP_SERVER", "smtp.gmail.com"),
+        "smtp_port": os.getenv("SMTP_PORT", "587"),
+        "allowed_senders": os.getenv("ALLOWED_SENDERS", ""),
+        "notification_email": os.getenv("NOTIFICATION_EMAIL", "")
+    }
+    return templates.TemplateResponse("index.html", {
+        "request": request, 
+        "defaults": env_defaults,
+        "config_mode": get_config_mode(),
+        "is_env_mode": is_env_mode()
+    })
 
 
 @app.get("/favicon.ico")

@@ -15,6 +15,11 @@
         </header>
 
         <main>
+            {% if is_env_mode %}
+            <div class="alert alert-info">
+                🔒 Configuratie modus: ENV - Instellingen zijn alleen-lezen
+            </div>
+            {% endif %}
             <div class="config-container">
                 <form id="config-form" class="config-form">
                     <!-- Mailserver Configuratie -->
@@ -25,13 +30,13 @@
                         <div class="form-group">
                             <label for="email">📧 E-mailadres:</label>
                             <input type="email" id="email" name="email" required 
-                                   placeholder="je@email.com" autocomplete="email">
+                                   placeholder="je@email.com" autocomplete="email" value="{{ defaults.email }}" {% if is_env_mode %}readonly{% endif %}>
                         </div>
                         
                         <div class="form-group">
                             <label for="password">🔐 Wachtwoord/App-wachtwoord:</label>
                             <input type="password" id="password" name="password" required
-                                   placeholder="••••••••••••" autocomplete="current-password">
+                                   placeholder="••••••••••••" autocomplete="current-password" {% if is_env_mode %}readonly{% endif %}>
                             <small class="help-text">Voor Gmail: gebruik een app-specifiek wachtwoord</small>
                         </div>
                         
@@ -39,13 +44,13 @@
                             <div class="form-group">
                                 <label for="imap_server">📥 IMAP Server:</label>
                                 <input type="text" id="imap_server" name="imap_server" required 
-                                       placeholder="imap.gmail.com" value="imap.gmail.com">
+                                       placeholder="imap.gmail.com" value="{{ defaults.imap_server }}" {% if is_env_mode %}readonly{% endif %}>
                             </div>
                             
                             <div class="form-group">
                                 <label for="imap_port">🔌 IMAP Poort:</label>
                                 <input type="number" id="imap_port" name="imap_port" 
-                                       value="993" required min="1" max="65535">
+                                       value="{{ defaults.imap_port }}" required min="1" max="65535" {% if is_env_mode %}readonly{% endif %}>
                             </div>
                         </div>
                         
@@ -53,13 +58,13 @@
                             <div class="form-group">
                                 <label for="smtp_server">📤 SMTP Server:</label>
                                 <input type="text" id="smtp_server" name="smtp_server" required 
-                                       placeholder="smtp.gmail.com" value="smtp.gmail.com">
+                                       placeholder="smtp.gmail.com" value="{{ defaults.smtp_server }}" {% if is_env_mode %}readonly{% endif %}>
                             </div>
                             
                             <div class="form-group">
                                 <label for="smtp_port">🔌 SMTP Poort:</label>
                                 <input type="number" id="smtp_port" name="smtp_port" 
-                                       value="587" required min="1" max="65535">
+                                       value="{{ defaults.smtp_port }}" required min="1" max="65535" {% if is_env_mode %}readonly{% endif %}>
                             </div>
                         </div>
                     </div>
@@ -72,14 +77,14 @@
                         <div class="form-group">
                             <label for="allowed_senders">✅ Toegestane afzenders (input):</label>
                             <input type="text" id="allowed_senders" name="allowed_senders" required
-                                   placeholder="my@remarkable.com">
+                                   placeholder="my@remarkable.com" value="{{ defaults.allowed_senders }}" {% if is_env_mode %}readonly{% endif %}>
                             <small class="help-text">Comma-gescheiden lijst van email adressen die Remarkable PDF's mogen sturen</small>
                         </div>
                         
                         <div class="form-group">
                             <label for="notification_email">📧 Notificatie e-mailadres (output) - Optioneel:</label>
                             <input type="email" id="notification_email" name="notification_email"
-                                   placeholder="ontvanger@email.com">
+                                   placeholder="ontvanger@email.com" value="{{ defaults.notification_email }}" {% if is_env_mode %}readonly{% endif %}>
                             <small class="help-text">E-mailadres waar OCR resultaten naartoe gestuurd worden. Laat leeg om je hoofdadres te gebruiken.</small>
                         </div>
                     </div>
@@ -92,7 +97,7 @@
                         <div class="form-group">
                             <label for="openrouter_api_key">🔑 OpenRouter API Key (Optioneel):</label>
                             <input type="password" id="openrouter_api_key" name="openrouter_api_key"
-                                   placeholder="sk-or-v1-...">
+                                   placeholder="sk-or-v1-..." {% if is_env_mode %}readonly{% endif %}>
                             <small class="help-text">Voor OCR functionaliteit. Zonder API key wordt alleen email polling getest.</small>
                         </div>
                     </div>
@@ -102,7 +107,7 @@
                         <h2>🔍 Test Alle Instellingen</h2>
                         <p class="section-description">Test de verbinding met al je configuratie instellingen</p>
                         
-                        <button type="submit" class="btn-primary" id="test-btn">
+                        <button type="submit" class="btn-primary" id="test-btn" {% if is_env_mode %}disabled{% endif %}>
                             🔍 Test Verbinding
                         </button>
                     </div>

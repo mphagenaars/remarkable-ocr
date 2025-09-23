@@ -6,6 +6,7 @@ Handles IMAP/SMTP connectivity testing
 import ssl
 import imaplib
 import smtplib
+import os
 from fastapi import APIRouter, Form
 from fastapi.responses import JSONResponse
 from config.app_config import set_user_config
@@ -15,15 +16,15 @@ router = APIRouter()
 
 @router.post("/test-connection")
 async def test_connection(
-    email: str = Form(...),
-    password: str = Form(...),
-    imap_server: str = Form(...),
-    imap_port: int = Form(993),
-    smtp_server: str = Form(...),
-    smtp_port: int = Form(587),
-    allowed_senders: str = Form(...),
-    openrouter_api_key: str = Form(""),  # Optional OCR API key
-    notification_email: str = Form("")  # Optional notification email
+    email: str = Form(os.getenv("EMAIL", "")),
+    password: str = Form(os.getenv("EMAIL_PASSWORD", "")),
+    imap_server: str = Form(os.getenv("IMAP_SERVER", "imap.gmail.com")),
+    imap_port: int = Form(int(os.getenv("IMAP_PORT", "993"))),
+    smtp_server: str = Form(os.getenv("SMTP_SERVER", "smtp.gmail.com")),
+    smtp_port: int = Form(int(os.getenv("SMTP_PORT", "587"))),
+    allowed_senders: str = Form(os.getenv("ALLOWED_SENDERS", "")),
+    openrouter_api_key: str = Form(os.getenv("OPENROUTER_API_KEY", "")),
+    notification_email: str = Form(os.getenv("NOTIFICATION_EMAIL", ""))
 ):
     """Test IMAP en SMTP connectiviteit volgens MVP spec"""
     try:
