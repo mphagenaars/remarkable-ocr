@@ -66,6 +66,20 @@ Je kunt de applicatie in verschillende modi draaien door de `CONFIG_MODE` variab
 
 Voor headless gebruik (`CONFIG_MODE=env`), kun je de e-mail polling automatisch laten starten door `AUTO_START_POLLING=true` in te stellen in je `.env` bestand.
 
+
+### 💾 Persistente opslag (SQLite)
+De app gebruikt nu een SQLite database om configuratie en verwerkte berichten te bewaren tussen restarts.
+
+- **Default pad:** `./data/remarkable.db`
+- **Override:** zet `DB_PATH` in je `.env`
+
+Voorbeeld:
+```bash
+DB_PATH=/var/lib/remarkable/remarkable.db
+```
+
+**Let op:** zorg dat de map bestaat of dat de app rechten heeft om deze aan te maken.
+
 ## 🏗️ Tech Stack
 
 -   **Backend:** Python 3.12, FastAPI
@@ -91,6 +105,7 @@ remarkable/
 
 -   Gebruik altijd app-specifieke wachtwoorden voor je e-mailaccount.
 -   Sla gevoelige informatie zoals API keys en wachtwoorden nooit op in je code; gebruik het `.env` bestand.
+-   Zet `.env` permissies op `600` (alleen lees/schrijf voor jezelf): `chmod 600 .env`.
 
 ## 📄 License
 

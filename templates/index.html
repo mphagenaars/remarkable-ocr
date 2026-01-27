@@ -19,7 +19,66 @@
             <div class="alert alert-info">
                 🔒 Configuratie modus: ENV - Instellingen zijn alleen-lezen
             </div>
-            {% endif %}
+
+            <div class="config-container">
+                <div class="config-section">
+                    <h2>📊 Statusoverzicht</h2>
+                    <p class="section-description">Live status van je headless configuratie</p>
+                    <div class="form-group">
+                        <strong>Account:</strong> {{ status_info.email or "Onbekend" }}
+                    </div>
+                    <div class="form-group">
+                        <strong>Polling status:</strong>
+                        {% if status_info.polling_active %}🟢 Actief{% else %}⚪ Inactief{% endif %}
+                        {% if status_info.polling_interval %}
+                            ({{ status_info.polling_interval }}s)
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <strong>Notificatie email:</strong> {{ status_info.notification_email or "Niet ingesteld" }}
+                    </div>
+                    <div class="form-group">
+                        <strong>Allowed senders:</strong>
+                        {% if status_info.allowed_senders and status_info.allowed_senders|length > 0 %}
+                            {{ status_info.allowed_senders | join(", ") }}
+                        {% else %}
+                            Niet ingesteld
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="config-section">
+                    <h2>🧾 Verwerkte berichten</h2>
+                    <p class="section-description">Laatste 20 verwerkte e-mails</p>
+                    {% if recent_processed and recent_processed|length > 0 %}
+                        <table class="status-table">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Message ID</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in recent_processed %}
+                                <tr>
+                                    <td>{{ item.processed_at }}</td>
+                                    <td>{{ item.message_id }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <div class="status-inactive">Geen verwerkte berichten gevonden</div>
+                    {% endif %}
+                </div>
+
+                <div class="config-section">
+                    <h2>🛠️ Aanpassen</h2>
+                    <p class="section-description">Wijzig instellingen in je `.env` en herstart de app.</p>
+                    <div class="status-inactive">Tip: gebruik `CONFIG_MODE=env` voor headless usage.</div>
+                </div>
+            </div>
+            {% else %}
             <div class="config-container">
                 <form id="config-form" class="config-form">
                     <!-- Mailserver Configuratie -->
@@ -182,6 +241,7 @@
                     </div>
                 </div>
             </div>
+        {% endif %}
         </main>
         
         <footer>

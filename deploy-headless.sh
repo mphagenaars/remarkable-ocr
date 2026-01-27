@@ -38,6 +38,16 @@ check_venv() {
     echo "✅ Virtual environment gevonden"
 }
 
+# Functie: Zorg voor veilige .env permissies
+ensure_env_permissions() {
+    if [[ -f "$SCRIPT_DIR/.env" ]]; then
+        chmod 600 "$SCRIPT_DIR/.env"
+        echo "✅ .env permissies gezet op 600"
+    else
+        echo "⚠️  Geen .env gevonden in $SCRIPT_DIR (sla permissies over)"
+    fi
+}
+
 # Functie: Cleanup poort 8000 conflicten
 cleanup_port() {
     echo "🔍 Checking poort 8000..."
@@ -143,6 +153,7 @@ case "${1:-start}" in
     "start")
         check_screen
         check_venv
+        ensure_env_permissions
         stop_service
         start_service
         check_status

@@ -60,9 +60,8 @@ async def start_polling_internal(email: str, background_tasks: BackgroundTasks =
         background_tasks.add_task(handler.start_polling, polling_interval)
     else:
         # When called from startup, no background_tasks object is available.
-        # We run it in a separate thread.
-        loop = asyncio.get_event_loop()
-        loop.run_in_executor(None, handler.start_polling, polling_interval)
+        # Start polling as a background task on the event loop.
+        asyncio.create_task(handler.start_polling(polling_interval))
 
     # Update status
     config_data["status"] = "polling"

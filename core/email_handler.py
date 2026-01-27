@@ -13,7 +13,7 @@ import email
 import imaplib
 import asyncio
 import logging
-from typing import List, Dict, Any, Optional, Set
+from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -71,7 +71,6 @@ class EmailHandler:
     def __init__(self, config: EmailConfig):
         self.config = config
         self.is_polling = False
-        self.processed_messages: Set[str] = set()
         self._polling_task: Optional[asyncio.Task] = None
         
         # Initialize OCR processor if API key is available
@@ -125,11 +124,12 @@ class EmailHandler:
                     for msg_id in message_ids:
                         msg_id_str = msg_id.decode()
                         
-                        if msg_id_str in self.processed_messages:
+                        from config.storage import is_message_processed, mark_message_processed
+                        if is_message_processed(self.config.email, msg_id_str):
                             continue
                             
                         await self._process_email(imap, msg_id_str)
-                        self.processed_messages.add(msg_id_str)
+                        mark_message_processed(self.config.email, msg_id_str)
                         
         except Exception as e:
             logger.error(f"Email check failed for {self.config.email}: {e}")

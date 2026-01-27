@@ -7,14 +7,20 @@ from typing import Dict, Any
 import os
 from core.email_handler import EmailHandler
 from core.notification_handler import NotificationHandler
+from config.storage import (
+    init_db,
+    get_user_config as storage_get_user_config,
+    set_user_config as storage_set_user_config,
+    list_users as storage_list_users,
+)
 
-# In-memory storage voor MVP (later vervangen door SQLite in Stap 4)
-user_configs: Dict[str, Dict[str, Any]] = {}
+# Initialize persistent storage
+init_db()
 
-# Active email handlers
+# Active email handlers (runtime-only)
 active_handlers: Dict[str, EmailHandler] = {}
 
-# Active notification handlers
+# Active notification handlers (runtime-only)
 notification_handlers: Dict[str, NotificationHandler] = {}
 
 
@@ -60,6 +66,8 @@ def validate_env_config() -> tuple[bool, str]:
         return False, "ALLOWED_SENDERS must contain at least one valid email address"
     
     return True, "Configuration valid"
+
+
 
 
 async def auto_start_polling():
@@ -115,7 +123,8 @@ def auto_configure_env_user():
     if is_env_mode():
         try:
             env_config = load_env_config()
-            set_user_config(env_config["email"], env_config)
+            if not is_user_configured(env_config["email"]):
+                set_user_config(env_config["email"], env_config)
             print(f"Auto-configured user: {env_config['email']}")
         except ValueError as e:
             print(f"ENV configuration error: {e}")
@@ -123,17 +132,18 @@ def auto_configure_env_user():
 
 def get_user_config(email: str) -> Dict[str, Any]:
     """Get user configuration by email"""
-    return user_configs.get(email, {})
+    config = storage_get_user_config(email)
+    return config or {}
 
 
 def set_user_config(email: str, config: Dict[str, Any]) -> None:
     """Set user configuration"""
-    user_configs[email] = config
+    storage_set_user_config(email, config)
 
 
 def is_user_configured(email: str) -> bool:
     """Check if user is configured"""
-    return email in user_configs
+    return storage_get_user_config(email) is not None
 
 
 def get_active_handler(email: str) -> EmailHandler:
@@ -169,9 +179,10 @@ def set_notification_handler(email: str, handler: NotificationHandler) -> None:
 
 def get_stats() -> Dict[str, Any]:
     """Get application statistics"""
+    users = storage_list_users()
     return {
-        "configured_users": len(user_configs),
+        "configured_users": len(users),
         "active_handlers": len(active_handlers),
         "notification_handlers": len(notification_handlers),
-        "users": list(user_configs.keys())
+        "users": list(users)
     }

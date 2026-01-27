@@ -30,7 +30,15 @@ pip install --upgrade pip setuptools wheel
 echo "📚 Stap 4: Python packages installeren..."
 pip install -r requirements.txt
 
-echo "✅ Stap 5: Installatie testen..."
+echo "🔒 Stap 5: .env permissies controleren..."
+if [ -f ".env" ]; then
+    chmod 600 .env
+    echo "✅ .env permissies gezet op 600"
+else
+    echo "⚠️  Geen .env gevonden. Maak er een aan via: cp .env.example .env"
+fi
+
+echo "✅ Stap 6: Installatie testen..."
 python3 -c "import fastapi; print('FastAPI: OK')"
 python3 -c "import uvicorn; print('Uvicorn: OK')"
 python3 -c "import httpx; print('HTTPX: OK')"
