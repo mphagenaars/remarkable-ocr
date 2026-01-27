@@ -5,8 +5,8 @@ Handles mailbox polling start/stop/status
 
 from fastapi import APIRouter, Form, BackgroundTasks
 from fastapi.responses import JSONResponse
-import asyncio
 from core.email_handler import EmailHandler, create_email_config, validate_email_config
+from core.polling_scheduler import schedule_polling, unschedule_polling
 from core.notification_handler import NotificationHandler
 from config.app_config import (
     get_user_config, is_user_configured, get_active_handler, 
@@ -54,14 +54,10 @@ async def start_polling_internal(email: str, background_tasks: BackgroundTasks =
         set_notification_handler(email, notification_handler)
         print(f"Notification handler initialized for {email} with target: {notification_email}")
     
-    # Start polling in background
+    # Start polling via scheduler
     polling_interval = int(os.getenv("POLLING_INTERVAL", 300))
-    if background_tasks:
-        background_tasks.add_task(handler.start_polling, polling_interval)
-    else:
-        # When called from startup, no background_tasks object is available.
-        # Start polling as a background task on the event loop.
-        asyncio.create_task(handler.start_polling(polling_interval))
+    schedule_polling(email, handler, polling_interval)
+    handler.is_polling = True
 
     # Update status
     config_data["status"] = "polling"
@@ -100,9 +96,10 @@ async def stop_polling(email: str = Form(...)):
         })
     
     try:
-        # Stop handler
+        # Stop handler and unschedule
         handler = get_active_handler(email)
         handler.stop_polling()
+        unschedule_polling(email)
         remove_active_handler(email)
         
         # Update status

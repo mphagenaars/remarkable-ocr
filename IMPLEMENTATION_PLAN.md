@@ -542,6 +542,12 @@ git reset --hard HEAD~1
 
 ## AANVULLENDE ACTIELIJST: PRODUCTION-HARDENING
 
+### P0 (moet voor "af")
+- [ ] **Persistente opslag** (SQLite/Postgres) voor user config + polling state
+- [x] **Fail-fast startup** bij ongeldige ENV (exit code + duidelijke fout)
+- [x] **IMAP flagging/labeling** voor verwerkte berichten (i.p.v. in-memory set)
+- [x] **Robuuste polling** (scheduler/worker i.p.v. ad-hoc asyncio tasks)
+
 ## MICROSTAPPEN P0.1: Persistente opslag (SQLite-first)
 **Doel:** Configuratie en polling state overleven herstarten.
 **Scope:** Vervang in-memory `user_configs`/`active_handlers` voor persistente opslag van config + processing state. Active handlers blijven runtime‑only.

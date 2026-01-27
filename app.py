@@ -28,6 +28,7 @@ from config.app_config import (
     is_polling_active,
 )
 from config.storage import list_recent_processed
+from core.polling_scheduler import start_scheduler, shutdown_scheduler
 
 # Load environment variables
 load_dotenv()
@@ -38,6 +39,8 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Configure application lifecycle."""
+    start_scheduler()
+
     is_valid, message = validate_env_config()
     if not is_valid:
         logger.error("=" * 50)
@@ -53,7 +56,7 @@ async def lifespan(app: FastAPI):
 
     yield
 
-    # TODO: graceful shutdown hooks can be added here
+    shutdown_scheduler()
 
 
 app = FastAPI(

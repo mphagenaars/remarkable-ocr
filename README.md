@@ -66,6 +66,11 @@ Je kunt de applicatie in verschillende modi draaien door de `CONFIG_MODE` variab
 
 Voor headless gebruik (`CONFIG_MODE=env`), kun je de e-mail polling automatisch laten starten door `AUTO_START_POLLING=true` in te stellen in je `.env` bestand.
 
+### 📥 IMAP flagging
+Na verwerking kunnen e-mails automatisch als **gelezen** gemarkeerd worden:
+
+- Zet `MARK_AS_READ=true` in je `.env` (default: `true`).
+
 
 ### 💾 Persistente opslag (SQLite)
 De app gebruikt nu een SQLite database om configuratie en verwerkte berichten te bewaren tussen restarts.

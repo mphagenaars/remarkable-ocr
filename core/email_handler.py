@@ -13,6 +13,7 @@ import email
 import imaplib
 import asyncio
 import logging
+import os
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
 from email.mime.text import MIMEText
@@ -84,27 +85,10 @@ class EmailHandler:
         else:
             logger.warning(f"No OpenRouter API key provided for {config.email}, OCR disabled")
         
-    async def start_polling(self, interval_seconds: int = 300):
-        """Start background polling van mailbox"""
-        if self.is_polling:
-            logger.warning(f"Polling already active for {self.config.email}")
-            return
-            
-        self.is_polling = True
-        logger.info(f"Starting email polling for {self.config.email} every {interval_seconds}s")
-        
-        self._polling_task = asyncio.create_task(self._poll_loop(interval_seconds))
-        
-    async def _poll_loop(self, interval_seconds: int):
-        """Main polling loop"""
-        while self.is_polling:
-            try:
-                await self._check_new_emails()
-                await asyncio.sleep(interval_seconds)
-            except Exception as e:
-                logger.error(f"Polling error for {self.config.email}: {e}")
-                await asyncio.sleep(interval_seconds)  # Continue polling despite errors
-                
+    async def poll_once(self):
+        """Check mailbox once for new emails."""
+        await self._check_new_emails()
+
     async def _check_new_emails(self):
         """Check for new emails from allowed senders with attachments"""
         try:
@@ -171,7 +155,11 @@ class EmailHandler:
                         logger.info(f"Attachment found: {attachment['filename']} ({attachment['content_type']})")
             else:
                 logger.info(f"No PDF/PNG attachments found in email from {sender_email}")
-                
+            
+            # Mark as read after processing (optional)
+            if os.getenv("MARK_AS_READ", "true").lower() == "true":
+                imap.store(msg_id, "+FLAGS", "\\Seen")
+
         except Exception as e:
             logger.error(f"Failed to process email {msg_id}: {e}")
     
@@ -262,7 +250,7 @@ class EmailHandler:
         return attachments
         
     def stop_polling(self):
-        """Stop polling"""
+        """Stop polling (scheduler will remove jobs separately)"""
         self.is_polling = False
         if self._polling_task:
             self._polling_task.cancel()
