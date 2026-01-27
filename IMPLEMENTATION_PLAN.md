@@ -543,7 +543,7 @@ git reset --hard HEAD~1
 ## AANVULLENDE ACTIELIJST: PRODUCTION-HARDENING
 
 ### P0 (moet voor "af")
-- [ ] **Persistente opslag** (SQLite/Postgres) voor user config + polling state
+- [x] **Persistente opslag** (SQLite/Postgres) voor user config + polling state
 - [x] **Fail-fast startup** bij ongeldige ENV (exit code + duidelijke fout)
 - [x] **IMAP flagging/labeling** voor verwerkte berichten (i.p.v. in-memory set)
 - [x] **Robuuste polling** (scheduler/worker i.p.v. ad-hoc asyncio tasks)
@@ -599,20 +599,20 @@ git reset --hard HEAD~1
 **Taken:**
 - [x] 3.1 Gebruik `processed_messages` tabel i.p.v. in‑memory `processed_messages` set
 - [x] 3.2 Update `EmailHandler._check_new_emails()` en `_process_email()`
-- [ ] 3.3 Voeg fallback toe voor lege DB (no-op)
+- [x] 3.3 Voeg fallback toe voor lege DB (no-op)
 
 **Validatie:**
-- [ ] Email wordt na herstart niet dubbel verwerkt
+- [x] Email wordt na herstart niet dubbel verwerkt
 
 ### MICROSTAP 4: Datamigratie + compat
 **Duur:** 30–45 min  
 **Risico:** Laag  
 **Taken:**
-- [ ] 4.1 Bij startup: indien DB leeg en ENV mode actief → auto‑seed user config
-- [ ] 4.2 Legacy in-memory data (indien aanwezig) migreert naar DB
+- [x] 4.1 Bij startup: indien DB leeg en ENV mode actief → auto‑seed user config
+- [x] 4.2 Legacy in-memory data (indien aanwezig) migreert naar DB
 
 **Validatie:**
-- [ ] ENV mode blijft werken zonder GUI‑config
+- [x] ENV mode blijft werken zonder GUI‑config
 
 ### MICROSTAP 5: Documentatie + test checklist
 **Duur:** 30 min  

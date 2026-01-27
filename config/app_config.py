@@ -12,6 +12,7 @@ from config.storage import (
     get_user_config as storage_get_user_config,
     set_user_config as storage_set_user_config,
     list_users as storage_list_users,
+    has_users as storage_has_users,
 )
 
 # Initialize persistent storage
@@ -123,7 +124,7 @@ def auto_configure_env_user():
     if is_env_mode():
         try:
             env_config = load_env_config()
-            if not is_user_configured(env_config["email"]):
+            if not storage_has_users() or not is_user_configured(env_config["email"]):
                 set_user_config(env_config["email"], env_config)
             print(f"Auto-configured user: {env_config['email']}")
         except ValueError as e:

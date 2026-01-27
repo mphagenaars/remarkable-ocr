@@ -146,3 +146,10 @@ def list_recent_processed(email: Optional[str] = None, limit: int = 20) -> Itera
             {"email": row["email"], "message_id": row["message_id"], "processed_at": row["processed_at"]}
             for row in rows
         ]
+
+
+def has_users() -> bool:
+    """Check if any users exist in storage."""
+    with get_conn() as conn:
+        row = conn.execute("SELECT 1 FROM users LIMIT 1").fetchone()
+        return row is not None
