@@ -153,3 +153,26 @@ def has_users() -> bool:
     with get_conn() as conn:
         row = conn.execute("SELECT 1 FROM users LIMIT 1").fetchone()
         return row is not None
+
+
+def count_processed_messages(email: Optional[str] = None) -> int:
+    """Count processed messages (optionally filtered by email)."""
+    with get_conn() as conn:
+        if email:
+            row = conn.execute(
+                "SELECT COUNT(1) AS cnt FROM processed_messages WHERE email = ?",
+                (email,),
+            ).fetchone()
+        else:
+            row = conn.execute("SELECT COUNT(1) AS cnt FROM processed_messages").fetchone()
+        return int(row["cnt"]) if row else 0
+
+
+def check_db() -> tuple[bool, str]:
+    """Simple DB health check."""
+    try:
+        with get_conn() as conn:
+            conn.execute("SELECT 1").fetchone()
+        return True, "ok"
+    except Exception as e:
+        return False, str(e)

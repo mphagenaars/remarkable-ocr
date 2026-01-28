@@ -20,6 +20,9 @@ from pathlib import Path
 import os
 import jinja2
 
+from .retry import compute_backoff
+from .metrics import inc_counter
+
 logger = logging.getLogger(__name__)
 
 # Set up Jinja2 environment for email templates
@@ -39,8 +42,11 @@ class NotificationHandler:
         """
         self.smtp_config = smtp_config
         self.notification_email = notification_email
-        self.max_retries = 3
-        self.retry_delay = 5  # seconds
+        self.max_retries = int(os.getenv("SMTP_MAX_RETRIES", "3"))
+        self.base_retry_delay = float(os.getenv("SMTP_RETRY_BASE_DELAY", "2"))
+        self.max_retry_delay = float(os.getenv("SMTP_RETRY_MAX_DELAY", "30"))
+        self.retry_multiplier = float(os.getenv("SMTP_RETRY_MULTIPLIER", "2"))
+        self.retry_jitter = float(os.getenv("SMTP_RETRY_JITTER", "0.1"))
         
     def set_notification_email(self, email: str):
         """Set or update the notification email address.
@@ -225,6 +231,7 @@ Automatisch verwerkt door Remarkable 2 naar Tekst Converter.
         
         while retries < self.max_retries:
             try:
+                inc_counter("smtp_send_attempts_total")
                 context = ssl.create_default_context()
                 
                 with smtplib.SMTP(self.smtp_config["smtp_server"], self.smtp_config["smtp_port"]) as server:
@@ -237,6 +244,7 @@ Automatisch verwerkt door Remarkable 2 naar Tekst Converter.
                     )
                 
                 logger.info(f"OCR notificatie succesvol verzonden naar {recipient}")
+                inc_counter("smtp_send_success_total")
                 return True
                 
             except Exception as e:
@@ -244,9 +252,15 @@ Automatisch verwerkt door Remarkable 2 naar Tekst Converter.
                 logger.error(f"Poging {retries}/{self.max_retries} om email te verzenden mislukt: {e}")
                 
                 if retries < self.max_retries:
-                    await asyncio.sleep(self.retry_delay)
-                    # Increase delay for next retry (exponential backoff)
-                    self.retry_delay *= 2
+                    delay = compute_backoff(
+                        attempt=retries,
+                        base_delay=self.base_retry_delay,
+                        max_delay=self.max_retry_delay,
+                        multiplier=self.retry_multiplier,
+                        jitter=self.retry_jitter,
+                    )
+                    await asyncio.sleep(delay)
         
         logger.error(f"OCR notificatie kon niet worden verzonden na {self.max_retries} pogingen")
+        inc_counter("smtp_send_fail_total")
         return False

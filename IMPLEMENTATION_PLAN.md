@@ -10,10 +10,10 @@
 ## Nog te doen (prioriteit)
 
 ### P1 (aanbevolen)
-- [ ] **Retries + backoff** voor OCR en SMTP.
-- [ ] **Observability**: structured logs + metrics + uitgebreid `/health`.
-- [ ] **Test suite**: unit + integration (IMAP/SMTP mocks) + e2e.
-- [ ] **Test matrix** aanvullen (restart + duplicate processing).
+- [x] **Retries + backoff** voor OCR en SMTP.
+- [x] **Observability**: structured logs + metrics + uitgebreid `/health`.
+- [x] **Test suite**: unit + integration (IMAP/SMTP mocks) + e2e.
+- [x] **Test matrix** aanvullen (restart + duplicate processing).
 
 ### P2 (nice‑to‑have)
 - [ ] **Deployment**: Docker + compose + systemd service.

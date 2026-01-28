@@ -56,6 +56,26 @@ Deze tool monitort een e-mailbox op PDF/PNG bijlagen van Remarkable 2 notities, 
 
 5.  Open je browser en ga naar `http://localhost:8000`.
 
+## 🚢 Deployment (systemd, LXC‑vriendelijk)
+
+Eenvoudige installatie als systemd‑service (maakt unit aan, enable + start):
+
+```bash
+./deploy-systemd.sh
+```
+
+Handige commando’s:
+
+```bash
+./deploy-systemd.sh status
+./deploy-systemd.sh logs
+./deploy-systemd.sh restart
+```
+
+Het script kiest automatisch:
+- `.venv/bin/python` als `.venv` bestaat
+- anders `python3` van het systeem
+
 ## ⚙️ Configuratie Modi
 
 Je kunt de applicatie in verschillende modi draaien door de `CONFIG_MODE` variabele in je `.env` bestand aan te passen:
@@ -84,6 +104,19 @@ DB_PATH=/var/lib/remarkable/remarkable.db
 ```
 
 **Let op:** zorg dat de map bestaat of dat de app rechten heeft om deze aan te maken.
+
+### 🔁 Retries & backoff
+Voor OCR en SMTP kun je retries en backoff instellen via `.env`:
+
+- `OCR_MAX_RETRIES`, `OCR_RETRY_BASE_DELAY`, `OCR_RETRY_MAX_DELAY`, `OCR_RETRY_MULTIPLIER`, `OCR_RETRY_JITTER`
+- `SMTP_MAX_RETRIES`, `SMTP_RETRY_BASE_DELAY`, `SMTP_RETRY_MAX_DELAY`, `SMTP_RETRY_MULTIPLIER`, `SMTP_RETRY_JITTER`
+
+### 📊 Observability
+Basis endpoints en logging:
+
+- `GET /health`: uitgebreide health met DB/scheduler/status.
+- `GET /metrics`: JSON metrics (counters/gauges/timers).
+- Logging via `.env`: `LOG_LEVEL`, `LOG_FORMAT` (`text`/`json`), `LOG_TO_FILE`, `LOG_FILE`.
 
 ## 🏗️ Tech Stack
 

@@ -14,6 +14,7 @@ import imaplib
 import asyncio
 import logging
 import os
+import time
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
 from email.mime.text import MIMEText
@@ -21,6 +22,7 @@ from email.mime.multipart import MIMEMultipart
 
 # Import OCR processor
 from .ocr_processor import OCRProcessor
+from .metrics import inc_counter, observe_duration
 
 logger = logging.getLogger(__name__)
 
@@ -91,6 +93,8 @@ class EmailHandler:
 
     async def _check_new_emails(self):
         """Check for new emails from allowed senders with attachments"""
+        poll_start = time.monotonic()
+        inc_counter("poll_cycles_total")
         try:
             context = ssl.create_default_context()
             
@@ -103,6 +107,7 @@ class EmailHandler:
                 
                 if status == "OK" and messages[0]:
                     message_ids = messages[0].split()
+                    inc_counter("emails_unread_total", len(message_ids))
                     logger.info(f"Found {len(message_ids)} unread emails for {self.config.email}")
                     
                     for msg_id in message_ids:
@@ -114,9 +119,13 @@ class EmailHandler:
                             
                         await self._process_email(imap, msg_id_str)
                         mark_message_processed(self.config.email, msg_id_str)
+                        inc_counter("emails_processed_total")
                         
         except Exception as e:
             logger.error(f"Email check failed for {self.config.email}: {e}")
+            inc_counter("poll_errors_total")
+        finally:
+            observe_duration("poll_cycle_seconds", time.monotonic() - poll_start)
             
     async def _process_email(self, imap: imaplib.IMAP4_SSL, msg_id: str):
         """Process individual email for attachments"""
@@ -136,6 +145,7 @@ class EmailHandler:
             
             if not self._is_allowed_sender(sender_email):
                 logger.info(f"Ignoring email from non-whitelisted sender: {sender_email}")
+                inc_counter("emails_blocked_total")
                 return
                 
             logger.info(f"Processing email from allowed sender: {sender_email}")
@@ -145,6 +155,7 @@ class EmailHandler:
             
             if attachments:
                 logger.info(f"Found {len(attachments)} attachments in email from {sender_email}")
+                inc_counter("attachments_total", len(attachments))
                 
                 # Process attachments with OCR if available
                 if self.ocr_processor:

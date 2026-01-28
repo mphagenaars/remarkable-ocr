@@ -13,6 +13,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse
 from dotenv import load_dotenv
 
+# Configure logging early
+from config.logging_config import setup_logging
 # Import route modules
 from routes.connection_routes import router as connection_router
 from routes.polling_routes import router as polling_router
@@ -34,6 +36,7 @@ from core.polling_scheduler import start_scheduler, shutdown_scheduler
 load_dotenv()
 
 # Setup logging
+setup_logging()
 logger = logging.getLogger(__name__)
 
 @asynccontextmanager
